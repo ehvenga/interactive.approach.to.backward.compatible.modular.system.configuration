@@ -20,20 +20,20 @@ const Navbar = () => {
         <p className='text-white text-2xl font-semibold'>Configable</p>
       </Link>
       <ul className='flex gap-x-6 text-xl'>
-        <li>
+        {/* <li>
           <Link
             href='/tool'
             className='font-medium text-white cursor-pointer border-b border-transparent hover:border-b hover:border-white'
           >
             Tool
           </Link>
-        </li>
+        </li> */}
         <li>
           <Link
-            href='/paper'
+            href='/details'
             className='font-medium text-white cursor-pointer border-b border-transparent hover:border-b hover:border-white'
           >
-            Paper
+            Details
           </Link>
         </li>
         <li>
