@@ -3,9 +3,9 @@ import Link from 'next/link';
 
 const Navbar = () => {
   return (
-    <nav className='px-24 py-4 flex items-center justify-between gap-x-5 border-b-2 border-blue-100 bg-blue-900'>
+    <nav className='px-24 py-4 flex items-center justify-between gap-x-5 border-b-2 bg-gray-900'>
       <Link href='/' className='flex items-center gap-x-2'>
-        {/* <Image
+        <Image
           src='/logo.png'
           width={30}
           height={30}
@@ -13,11 +13,12 @@ const Navbar = () => {
         />
         <Image
           src='/logo-letter.png'
-          width={200}
-          height={50}
+          width={180}
+          height={30}
           alt='Picture of the author'
-        /> */}
-        <p className='text-white text-2xl font-semibold'>Configable</p>
+          className='-mt-[2px]'
+        />
+        {/* <p className='text-white text-2xl font-semibold'>Configable</p> */}
       </Link>
       <ul className='flex gap-x-6 text-xl'>
         {/* <li>
@@ -31,7 +32,7 @@ const Navbar = () => {
         <li>
           <Link
             href='/details'
-            className='font-medium text-white cursor-pointer border-b border-transparent hover:border-b hover:border-white'
+            className='text-white hover:text-sky-400 cursor-pointer border-b border-transparent'
           >
             Details
           </Link>
@@ -39,7 +40,7 @@ const Navbar = () => {
         <li>
           <Link
             href='/team'
-            className='font-medium text-white cursor-pointer border-b border-transparent hover:border-b hover:border-white'
+            className='text-white hover:text-sky-400 cursor-pointer border-b border-transparent'
           >
             Team
           </Link>

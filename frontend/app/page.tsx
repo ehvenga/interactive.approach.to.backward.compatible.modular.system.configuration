@@ -30,23 +30,23 @@ export default function Home() {
 
   return (
     <main className='px-24 py-10'>
-      <h1 className='text-3xl font-semibold pb-4'>
+      <h1 className='text-3xl font-semibold pb-4 text-gray-700'>
         Interactive Configuration Tool
       </h1>
-      <div className='border-gray-100 border-2 rounded-2xl p-10'>
-        <h2 className='text-xl font-semibold border-b-2'>
+      <div className='border-gray-300 bg-gray-50 border rounded-2xl p-10'>
+        <h2 className='text-xl text-gray-600 font-semibold border-b-2'>
           Select Interface Parameters
         </h2>
 
         <div className='flex gap-3 mt-6'>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium'>Parameter List</h3>
+              <h3 className='font-medium text-gray-500'>Parameter List</h3>
               <h4 className='text-sm'>
                 {toBeSelectedInitialParamList.length} items
               </h4>
             </div>
-            <div className='h-60 overflow-y-auto text-black rounded bg-gray-50'>
+            <div className='h-60 overflow-y-auto text-black rounded bg-white border-gray-200 border'>
               <h3
                 onClick={handleMoveAllInitialParams}
                 className='bg-gray-100 border-b border-b-gray-300 hover:bg-gray-200 hover:font-medium hover:text-green-900 h-8 flex justify-center items-center cursor-pointer px-2'
@@ -66,12 +66,12 @@ export default function Home() {
           </div>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium'>Initial Parameters</h3>
+              <h3 className='font-medium text-gray-500'>Initial Parameters</h3>
               <h4 className='text-sm'>
                 {selectedInitialParameterList.length} items
               </h4>
             </div>
-            <div className='h-60 overflow-y-auto text-black rounded bg-gray-50'>
+            <div className='h-60 overflow-y-auto text-black rounded bg-white border-gray-200 border'>
               <h3
                 onClick={handleClearAllInitialParams}
                 className='bg-gray-100 border-b border-b-gray-300 hover:bg-gray-200 hover:font-medium hover:text-red-800 h-8 flex justify-center items-center cursor-pointer px-2'
@@ -94,12 +94,12 @@ export default function Home() {
         <div className='flex gap-3 mt-6'>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium'>Goal List</h3>
+              <h3 className='font-medium text-gray-500'>Goal List</h3>
               <h4 className='text-sm'>
                 {toBeSelectedInitialParamList.length} items
               </h4>
             </div>
-            <div className='h-60 overflow-y-auto text-black rounded bg-gray-50'>
+            <div className='h-60 overflow-y-auto text-black rounded bg-white border-gray-200 border'>
               <h3
                 onClick={handleMoveAllInitialParams}
                 className='bg-gray-100 border-b border-b-gray-300 hover:bg-gray-200 hover:font-medium hover:text-green-900 h-8 flex justify-center items-center cursor-pointer px-2'
@@ -119,12 +119,12 @@ export default function Home() {
           </div>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium'>Goal Parameters</h3>
+              <h3 className='font-medium text-gray-500'>Goal Parameters</h3>
               <h4 className='text-sm'>
                 {selectedInitialParameterList.length} items
               </h4>
             </div>
-            <div className='h-60 overflow-y-auto text-black rounded bg-gray-50'>
+            <div className='h-60 overflow-y-auto text-black rounded bg-white border-gray-200 border'>
               <h3
                 onClick={handleClearAllInitialParams}
                 className='bg-gray-100 border-b border-b-gray-300 hover:bg-gray-200 hover:font-medium hover:text-red-800 h-8 flex justify-center items-center cursor-pointer px-2'
@@ -144,7 +144,7 @@ export default function Home() {
           </div>
         </div>
 
-        <button className='bg-blue-800 px-5 py-3 rounded-lg text-lg text-white mt-6 hover:bg-blue-700'>
+        <button className='bg-sky-500 px-5 py-3 rounded-lg text-lg text-white mt-6 hover:bg-sky-400'>
           Configure Systems
         </button>
       </div>
