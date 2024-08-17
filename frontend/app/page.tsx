@@ -4,13 +4,26 @@ import { useState, useEffect } from 'react';
 
 interface Parameter {
   label: string;
+  name: string;
 }
 
 export default function Home() {
+  useEffect(() => {
+    handleFetchParameterList();
+  }, []);
+
   const [toBeSelectedInitialParamList, setToBeSelectedInitialParamList] =
     useState<Parameter[]>([]);
   const [selectedInitialParameterList, setSelectedInitialParameterList] =
     useState<Parameter[]>([]);
+
+  const handleFetchParameterList = () => {
+    setToBeSelectedInitialParamList([
+      { label: 'Param 1', name: 'Parameter 1' },
+      { label: 'Param 2', name: 'Parameter 2' },
+      { label: 'Param 3', name: 'Parameter 3' },
+    ]);
+  };
 
   const handleMoveAllInitialParams = () => {
     return;
