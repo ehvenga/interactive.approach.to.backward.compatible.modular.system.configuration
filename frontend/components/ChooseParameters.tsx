@@ -7,10 +7,6 @@ interface Parameter {
 }
 
 const ChooseParameters = () => {
-  useEffect(() => {
-    handleFetchParameterList();
-  }, []);
-
   const [toBeSelectedInitialParamList, setToBeSelectedInitialParamList] =
     useState<Parameter[]>([]);
   const [selectedInitialParameterList, setSelectedInitialParameterList] =
@@ -21,6 +17,18 @@ const ChooseParameters = () => {
   const [selectedGoalParameterList, setSelectedGoalParameterList] = useState<
     Parameter[]
   >([]);
+  const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
+
+  useEffect(() => {
+    handleFetchParameterList();
+  }, []);
+
+  useEffect(() => {
+    selectedInitialParameterList.length > 0 &&
+    selectedGoalParameterList.length > 0
+      ? setDisableConfigure(false)
+      : setDisableConfigure(true);
+  }, [selectedInitialParameterList, selectedGoalParameterList]);
 
   const handleFetchParameterList = () => {
     setToBeSelectedInitialParamList([
@@ -201,7 +209,10 @@ const ChooseParameters = () => {
           </div>
         </div>
 
-        <button className='bg-sky-500 px-5 py-3 rounded-lg text-lg text-white mt-6 hover:bg-sky-400'>
+        <button
+          className='bg-sky-500 px-5 py-3 rounded-lg text-lg text-white mt-6 hover:bg-sky-400 disabled:bg-gray-400'
+          disabled={disableConfigure}
+        >
           Configure Systems
         </button>
       </div>
