@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Autoblox: An Interactive Approach',
-  description: 'Solve your system configuration problems with Configable',
+  description: 'Solve your system configuration problems with Autoblox',
 };
 
 export default function RootLayout({

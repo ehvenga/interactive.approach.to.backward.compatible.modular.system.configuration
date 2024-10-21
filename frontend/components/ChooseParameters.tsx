@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
+import { stageAtom } from '@/utils/store';
+import { useRouter } from 'next/navigation';
 
 interface Parameter {
   id: number;
@@ -6,7 +9,10 @@ interface Parameter {
   name: string;
 }
 
-const ChooseParameters = () => {
+const ChooseParameters: React.FC = () => {
+  const router = useRouter();
+
+  const [stage, setStage] = useAtom(stageAtom);
   const [toBeSelectedInitialParamList, setToBeSelectedInitialParamList] =
     useState<Parameter[]>([]);
   const [selectedInitialParameterList, setSelectedInitialParameterList] =
@@ -93,6 +99,11 @@ const ChooseParameters = () => {
       return updatedGoalParamList;
     });
     return;
+  };
+
+  const handleConfigure = () => {
+    setStage(1);
+    router.push('/tool');
   };
 
   return (
@@ -212,6 +223,7 @@ const ChooseParameters = () => {
         <button
           className='bg-sky-500 px-5 py-3 rounded-lg text-lg text-white mt-6 hover:bg-sky-400 disabled:bg-gray-400'
           disabled={disableConfigure}
+          onClick={handleConfigure}
         >
           Configure Systems
         </button>
