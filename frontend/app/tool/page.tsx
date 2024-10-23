@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ChooseParts from '@/components/ChooseParts';
+import CurrentSolution from '@/components/CurrentSolution';
 
 const Tool: React.FC = () => {
   return (
@@ -8,7 +9,10 @@ const Tool: React.FC = () => {
       <h1 className='text-3xl font-semibold pb-4 text-gray-700'>
         Interactive Configuration Tool
       </h1>
-      <ChooseParts />
+      <div className='flex gap-x-5'>
+        <CurrentSolution />
+        <ChooseParts />
+      </div>
     </main>
   );
 };
