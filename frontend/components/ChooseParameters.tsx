@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { stageAtom } from '@/utils/store';
+import {
+  toBeSelectedInitialParamListAtom,
+  selectedInitialParameterListAtom,
+  toBeSelectedGoalParamListAtom,
+  selectedGoalParameterListAtom,
+  stageAtom,
+} from '@/utils/store';
 import { useRouter } from 'next/navigation';
 
 interface Parameter {
@@ -14,15 +20,15 @@ const ChooseParameters: React.FC = () => {
 
   const [stage, setStage] = useAtom(stageAtom);
   const [toBeSelectedInitialParamList, setToBeSelectedInitialParamList] =
-    useState<Parameter[]>([]);
+    useAtom(toBeSelectedInitialParamListAtom);
   const [selectedInitialParameterList, setSelectedInitialParameterList] =
-    useState<Parameter[]>([]);
-  const [toBeSelectedGoalParamList, setToBeSelectedGoalParamList] = useState<
-    Parameter[]
-  >([]);
-  const [selectedGoalParameterList, setSelectedGoalParameterList] = useState<
-    Parameter[]
-  >([]);
+    useAtom(selectedInitialParameterListAtom);
+  const [toBeSelectedGoalParamList, setToBeSelectedGoalParamList] = useAtom(
+    toBeSelectedGoalParamListAtom
+  );
+  const [selectedGoalParameterList, setSelectedGoalParameterList] = useAtom(
+    selectedGoalParameterListAtom
+  );
   const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
 
   useEffect(() => {
@@ -90,8 +96,14 @@ const ChooseParameters: React.FC = () => {
   };
 
   const handleSelectedInitialInputParamClicked = (param: Parameter) => {
+    setToBeSelectedInitialParamList((prevList) => [...prevList, param]);
+    setSelectedInitialParameterList((prevList) => {
+      const updatedGoalParamList = prevList.filter((p) => p !== param);
+      return updatedGoalParamList;
+    });
     return;
   };
+
   const handleSelectedGoalInputParamClicked = (param: Parameter) => {
     setToBeSelectedGoalParamList((prevList) => [...prevList, param]);
     setSelectedGoalParameterList((prevList) => {
