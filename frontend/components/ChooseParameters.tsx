@@ -56,61 +56,71 @@ const ChooseParameters: React.FC = () => {
   };
 
   const handleMoveAllInitialParams = () => {
-    setSelectedInitialParameterList(toBeSelectedInitialParamList);
+    setSelectedInitialParameterList((prevList) => [
+      ...prevList,
+      ...toBeSelectedInitialParamList.filter(
+        (param) => !prevList.some((p) => p.id === param.id)
+      ),
+    ]);
     setToBeSelectedInitialParamList([]);
   };
 
   const handleMoveAllGoalParams = () => {
-    setSelectedGoalParameterList(toBeSelectedGoalParamList);
+    setSelectedGoalParameterList((prevList) => [
+      ...prevList,
+      ...toBeSelectedGoalParamList.filter(
+        (param) => !prevList.some((p) => p.id === param.id)
+      ),
+    ]);
     setToBeSelectedGoalParamList([]);
   };
 
   const handleClearAllInitialParams = () => {
-    setToBeSelectedInitialParamList(selectedInitialParameterList);
+    setToBeSelectedInitialParamList((prevList) => [
+      ...prevList,
+      ...selectedInitialParameterList.filter(
+        (param) => !prevList.some((p) => p.id === param.id)
+      ),
+    ]);
     setSelectedInitialParameterList([]);
-    return;
   };
 
-  const handleClearAllIGoalParams = () => {
-    setToBeSelectedGoalParamList(selectedGoalParameterList);
+  const handleClearAllGoalParams = () => {
+    setToBeSelectedGoalParamList((prevList) => [
+      ...prevList,
+      ...selectedGoalParameterList.filter(
+        (param) => !prevList.some((p) => p.id === param.id)
+      ),
+    ]);
     setSelectedGoalParameterList([]);
-    return;
   };
 
   const handleInitialInputParamClicked = (param: Parameter) => {
     setSelectedInitialParameterList((prevList) => [...prevList, param]);
-    setToBeSelectedInitialParamList((prevList) => {
-      const updatedGoalParamList = prevList.filter((p) => p !== param);
-      return updatedGoalParamList;
-    });
-    return;
+    setToBeSelectedInitialParamList((prevList) =>
+      prevList.filter((p) => p.id !== param.id)
+    );
   };
 
   const handleGoalInputParamClicked = (param: Parameter) => {
     setSelectedGoalParameterList((prevList) => [...prevList, param]);
-    setToBeSelectedGoalParamList((prevList) => {
-      const updatedGoalParamList = prevList.filter((p) => p !== param);
-      return updatedGoalParamList;
-    });
-    return;
+    setToBeSelectedGoalParamList((prevList) =>
+      prevList.filter((p) => p.id !== param.id)
+    );
   };
 
   const handleSelectedInitialInputParamClicked = (param: Parameter) => {
     setToBeSelectedInitialParamList((prevList) => [...prevList, param]);
-    setSelectedInitialParameterList((prevList) => {
-      const updatedGoalParamList = prevList.filter((p) => p !== param);
-      return updatedGoalParamList;
-    });
-    return;
+    setSelectedInitialParameterList((prevList) =>
+      prevList.filter((p) => p.id !== param.id)
+    );
   };
 
   const handleSelectedGoalInputParamClicked = (param: Parameter) => {
     setToBeSelectedGoalParamList((prevList) => [...prevList, param]);
-    setSelectedGoalParameterList((prevList) => {
-      const updatedGoalParamList = prevList.filter((p) => p !== param);
-      return updatedGoalParamList;
-    });
-    return;
+    setSelectedGoalParameterList((prevList) =>
+      prevList.filter((p) => p.id !== param.id)
+    );
   };
 
   const handleConfigure = () => {
@@ -214,7 +224,7 @@ const ChooseParameters: React.FC = () => {
             </div>
             <div className='h-60 overflow-y-auto text-black rounded bg-white border-gray-200 border'>
               <h3
-                onClick={handleClearAllIGoalParams}
+                onClick={handleClearAllGoalParams}
                 className='bg-gray-100 border-b border-b-gray-300 hover:bg-gray-200 hover:font-medium hover:text-red-800 h-8 flex justify-center items-center cursor-pointer px-2'
               >
                 &lArr; Clear all
