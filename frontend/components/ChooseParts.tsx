@@ -32,9 +32,11 @@ const ChooseParts: React.FC = () => {
 
   useEffect(() => {
     setPartsList([
-      { id: 1, label: 'Part 1', name: 'Part 1' },
-      { id: 2, label: 'Part 2', name: 'Part 2' },
-      { id: 3, label: 'Part 3', name: 'Part 3' },
+      { id: 1, label: 'Controller', name: 'p1' },
+      { id: 2, label: 'VR Headset', name: 'p2' },
+      { id: 3, label: 'Laptop', name: 'p3' },
+      { id: 4, label: 'Monitor', name: 'p4' },
+      { id: 5, label: 'Capture Card', name: 'p5' },
     ]);
   }, [setPartsList]);
 

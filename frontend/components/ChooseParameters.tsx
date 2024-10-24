@@ -44,14 +44,24 @@ const ChooseParameters: React.FC = () => {
 
   const handleFetchParameterList = () => {
     setToBeSelectedInitialParamList([
-      { id: 1, label: 'Param 1', name: 'Parameter 1' },
-      { id: 2, label: 'Param 2', name: 'Parameter 2' },
-      { id: 3, label: 'Param 3', name: 'Parameter 3' },
+      { id: 1, label: 'USB 2.0', name: 'i1' },
+      { id: 2, label: 'USB 3.0', name: 'i2' },
+      { id: 3, label: 'Display Port 1.2', name: 'i3' },
+      { id: 4, label: 'Display Port 1.4', name: 'i4' },
+      { id: 5, label: 'HDMI 1.4', name: 'i5' },
+      { id: 6, label: 'HDMI 2.0', name: 'i6' },
+      { id: 7, label: 'PCIe 4.0', name: 'i7' },
+      { id: 8, label: 'PCIe 5.0', name: 'i8' },
     ]);
     setToBeSelectedGoalParamList([
-      { id: 4, label: 'Param 4', name: 'Parameter 4' },
-      { id: 5, label: 'Param 5', name: 'Parameter 5' },
-      { id: 6, label: 'Param 6', name: 'Parameter 6' },
+      { id: 1, label: 'USB 2.0', name: 'i1' },
+      { id: 2, label: 'USB 3.0', name: 'i2' },
+      { id: 3, label: 'Display Port 1.2', name: 'i3' },
+      { id: 4, label: 'Display Port 1.4', name: 'i4' },
+      { id: 5, label: 'HDMI 1.4', name: 'i5' },
+      { id: 6, label: 'HDMI 2.0', name: 'i6' },
+      { id: 7, label: 'PCIe 4.0', name: 'i7' },
+      { id: 8, label: 'PCIe 5.0', name: 'i8' },
     ]);
   };
 
