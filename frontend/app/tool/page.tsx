@@ -2,6 +2,7 @@ import React from 'react';
 
 import ChooseParts from '@/components/ChooseParts';
 import CurrentSolution from '@/components/CurrentSolution';
+import OptimalSolution from '@/components/OptimalSolution';
 
 const Tool: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const Tool: React.FC = () => {
         <CurrentSolution />
         <ChooseParts />
       </div>
+      <OptimalSolution type='sm' />
     </main>
   );
 };
