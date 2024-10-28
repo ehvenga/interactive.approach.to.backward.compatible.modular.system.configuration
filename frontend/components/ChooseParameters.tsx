@@ -133,8 +133,26 @@ const ChooseParameters: React.FC = () => {
     );
   };
 
-  const handleConfigure = () => {
+  const handleConfigure = async () => {
     setStage(1);
+    const response = await fetch('/api/config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        initialParameters: selectedInitialParameterList,
+        goalParameters: selectedGoalParameterList,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('API Response:', data);
+    } else {
+      console.error('API Error:', data);
+    }
     router.push('/tool');
   };
 
