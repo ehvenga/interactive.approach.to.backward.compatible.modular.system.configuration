@@ -31,6 +31,14 @@ const Navbar = () => {
         </li> */}
         <li>
           <Link
+            href='/db'
+            className='text-white hover:text-sky-400 cursor-pointer border-b border-transparent'
+          >
+            Database
+          </Link>
+        </li>
+        <li>
+          <Link
             href='/details'
             className='text-white hover:text-sky-400 cursor-pointer border-b border-transparent'
           >
