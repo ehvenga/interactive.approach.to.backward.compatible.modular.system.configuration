@@ -133,16 +133,28 @@ const ChooseParameters: React.FC = () => {
     );
   };
 
+  function getCookie(name) {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith(name + '='))
+      ?.split('=')[1];
+    return cookieValue || '';
+  }
+
   const handleConfigure = async () => {
     setStage(1);
-    const response = await fetch('/api/config', {
+    const csrfToken = getCookie('csrftoken');
+    const response = await fetch('http://127.0.0.1:8000/show_result', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
-        initialParameters: selectedInitialParameterList,
-        goalParameters: selectedGoalParameterList,
+        initials: ['p1', 'p10'], // Matches request.POST.getlist('initials')
+        knowledges: ['p11', 'p15'], // Matches request.POST.getlist('knowledges')
+        depth: 0, // Matches request.POST.get('depth')
+        child: 0, // Matches request.POST.get('child')
       }),
     });
 
