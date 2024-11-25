@@ -13,9 +13,10 @@ import {
 
 export default function Database() {
   const [parameterData, setParameterData] = useState([]);
+  const [partData, setPartData] = useState([]);
   const [inputParameterData, setInputParameterData] = useState([]);
   const [outputParameterData, setOutputParameterData] = useState([]);
-  const [hierarchyData, setHierarchyData] = useState([]);
+  const [initialGoalParams, setInitialGoalParams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,18 +36,19 @@ export default function Database() {
 
   // Fetch data for all tabs when the component mounts
   useEffect(() => {
-    fetchData('http://127.0.0.1:8000/api/parameterlist/', setParameterData);
+    fetchData('http://127.0.0.1:8002/api/parts/', setPartData);
+    fetchData('http://127.0.0.1:8002/api/parameters/', setParameterData);
     fetchData(
-      'http://127.0.0.1:8000/api/inputparameterlist/',
+      'http://127.0.0.1:8002/api/inputparameters/',
       setInputParameterData
     );
     fetchData(
-      'http://127.0.0.1:8000/api/outputparameterlist/',
+      'http://127.0.0.1:8002/api/outputparameters/',
       setOutputParameterData
     );
     fetchData(
-      'http://127.0.0.1:8000/api/parameterhierarchy/',
-      setHierarchyData
+      'http://127.0.0.1:8002/api/initialgoalparameters/',
+      setInitialGoalParams
     );
   }, []);
 
@@ -56,7 +58,7 @@ export default function Database() {
       <TableHeader>
         <TableRow>
           <TableHead>Parameter ID</TableHead>
-          <TableHead>Name</TableHead>
+          <TableHead>Parameter Name</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -70,19 +72,38 @@ export default function Database() {
     </Table>
   );
 
+  const renderPartList = () => (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Part ID</TableHead>
+          <TableHead>Part Name</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {partData.map((item) => (
+          <TableRow key={item.webserviceid}>
+            <TableCell>{item.webserviceid}</TableCell>
+            <TableCell>{item.name}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+
   const renderInputParameterList = () => (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Webservice ID</TableHead>
+          <TableHead>Part ID</TableHead>
           <TableHead>Parameter ID</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {inputParameterData.map((item, index) => (
           <TableRow key={index}>
-            <TableCell>{item.webserviceid_id}</TableCell>
-            <TableCell>{item.parameterid_id}</TableCell>
+            <TableCell>{item.webserviceid}</TableCell>
+            <TableCell>{item.parameterid}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -93,15 +114,15 @@ export default function Database() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Webservice ID</TableHead>
+          <TableHead>Part ID</TableHead>
           <TableHead>Parameter ID</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {outputParameterData.map((item, index) => (
           <TableRow key={index}>
-            <TableCell>{item.webserviceid_id}</TableCell>
-            <TableCell>{item.parameterid_id}</TableCell>
+            <TableCell>{item.webserviceid}</TableCell>
+            <TableCell>{item.parameterid}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -112,12 +133,12 @@ export default function Database() {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Hierarchy ID</TableHead>
+          <TableHead>Goal Parameters</TableHead>
           <TableHead>Details</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {hierarchyData.map((item, index) => (
+        {initialGoalParams.map((item, index) => (
           <TableRow key={index}>
             <TableCell>{item.hierarchyid}</TableCell>
             <TableCell>{item.details}</TableCell>
@@ -134,6 +155,7 @@ export default function Database() {
       {error && <p>Error: {error}</p>}
       <Tabs defaultValue='parameterlist' className='w-full'>
         <TabsList>
+          <TabsTrigger value='partlist'>Parts List</TabsTrigger>
           <TabsTrigger value='parameterlist'>Parameter List</TabsTrigger>
           <TabsTrigger value='inputparameterlist'>
             Input Parameter List
@@ -142,9 +164,14 @@ export default function Database() {
             Output Parameter List
           </TabsTrigger>
           <TabsTrigger value='parameterhierarchy'>
-            Parameter Hierarchy
+            Initial Goal Parameters
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value='partlist'>
+          {/* <TableCaption>Parameter List</TableCaption> */}
+          {renderPartList()}
+        </TabsContent>
 
         <TabsContent value='parameterlist'>
           {/* <TableCaption>Parameter List</TableCaption> */}
