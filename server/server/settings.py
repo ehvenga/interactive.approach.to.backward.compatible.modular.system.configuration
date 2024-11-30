@@ -86,7 +86,7 @@ WSGI_APPLICATION = "server.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'automsc',
+        'NAME': 'autowscs',
         'USER': 'root',
         'PASSWORD': 'autoplan',
         'HOST': 'localhost',

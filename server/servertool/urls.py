@@ -7,5 +7,5 @@ urlpatterns = [
     path('inputparameters/', InputParameterListView.as_view(), name='inputparameters'),
     path('outputparameters/', OutputParameterListView.as_view(), name='outputparameters'),
     path('initialgoalparameters/', InitialGoalParameterListView.as_view(), name='initialgoalparameters'),
-    path('get_result/', GetResultView.as_view(), name='get_result'),
+    path('get_result', GetResultView.as_view(), name='get_result'),
 ]

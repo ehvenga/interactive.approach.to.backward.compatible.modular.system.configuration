@@ -141,46 +141,20 @@ const ChooseParameters: React.FC = () => {
     return cookieValue || '';
   }
 
-  // const handleConfigure = async () => {
-  //   setStage(1);
-  //   const csrfToken = getCookie('csrftoken');
-  //   const response = await fetch('http://127.0.0.1:8000/show_result', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'X-CSRFToken': csrfToken,
-  //     },
-  //     body: JSON.stringify({
-  //       initials: ['p1', 'p10'], // Matches request.POST.getlist('initials')
-  //       knowledges: ['p11', 'p15'], // Matches request.POST.getlist('knowledges')
-  //       depth: 0, // Matches request.POST.get('depth')
-  //       child: 0, // Matches request.POST.get('child')
-  //     }),
-  //   });
-
-  //   const data = await response.json();
-
-  //   if (response.ok) {
-  //     console.log('API Response:', data);
-  //   } else {
-  //     console.error('API Error:', data);
-  //   }
-  //   router.push('/tool');
-  // };
-
   const handleConfigure = async () => {
-    const csrfToken = getCookie('csrftoken'); // Ensure CSRF cookie is available
-    const response = await fetch('http://127.0.0.1:8002/api/get_result/', {
+    setStage(1);
+    const csrfToken = getCookie('csrftoken');
+    const response = await fetch('http://127.0.0.1:8002/api/get_result', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
-        initials: ['PR1', 'PR3'], // Initials parameter
-        knowledges: ['PR7', 'PR8'], // Goals parameter
-        depth: '0', // Depth parameter
-        child: '0', // Child parameter
+        initials: ['pr2', 'pr4'],
+        knowledges: ['pr6', 'pr7'],
+        depth: '0',
+        child: '0',
       }),
     });
 
@@ -191,7 +165,33 @@ const ChooseParameters: React.FC = () => {
     } else {
       console.error('API Error:', data);
     }
+    router.push('/tool');
   };
+
+  // const handleConfigure = async () => {
+  //   const csrfToken = getCookie('csrftoken'); // Ensure CSRF cookie is available
+  //   const response = await fetch('http://127.0.0.1:8002/api/get_result/', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'X-CSRFToken': csrfToken,
+  //     },
+  //     body: JSON.stringify({
+  //       initials: ['PR1', 'PR3'], // Initials parameter
+  //       knowledges: ['PR7', 'PR8'], // Goals parameter
+  //       depth: '0', // Depth parameter
+  //       child: '0', // Child parameter
+  //     }),
+  //   });
+
+  //   const data = await response.json();
+
+  //   if (response.ok) {
+  //     console.log('API Response:', data);
+  //   } else {
+  //     console.error('API Error:', data);
+  //   }
+  // };
 
   return (
     <section>
