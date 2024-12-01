@@ -107,7 +107,7 @@ class GetResultView(View):
         try:
             data = json.loads(request.body)  # Parse the JSON body
             initials = data.get('initials', [])
-            goals = data.get('knowledges', [])
+            goals = data.get('goals', [])
             depth = data.get('depth', '0')
             child = data.get('child', '0')
 
@@ -119,12 +119,11 @@ class GetResultView(View):
 
             # Generate transaction ID
             random.seed()
-            transactID = random.randint(900000, 1000000)
+            transactID = random.randint(9000000, 10000000)
 
             # Write initials and goals to the database
             write_knowledge_to_table(transactID, initials, 'I')
             write_knowledge_to_table(transactID, goals, 'G')
-            print('init: ', initials, goals, transactID, depth, child,)
 
             # Run external Java process
             subprocess.call(['java', '-jar', 'C:\\AutoPlan\\AutoWSC-AIPSYooMath.jar', str(transactID), depth, child])
@@ -132,11 +131,12 @@ class GetResultView(View):
             # Fetch results
             lCourseObj = []
             resultList = Result.objects.filter(transactionid=transactID).order_by('stage')
-            print('resultList:',resultList)
+            
             for res in resultList:
               course = Webservicelist.objects.get(webserviceid=res.webserviceid)
-              course.stage = res.stage
-              lCourseObj.append(model_to_dict(course))
+              course_dict = model_to_dict(course)  # Convert the course object to a dictionary
+              course_dict['stage'] = res.stage  # Add the stage to the dictionary
+              lCourseObj.append(course_dict)  # Append the updated dictionary to the list
 
             # Return results as JSON
             return JsonResponse({

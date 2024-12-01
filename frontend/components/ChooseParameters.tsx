@@ -6,7 +6,20 @@ import {
   toBeSelectedGoalParamListAtom,
   selectedGoalParameterListAtom,
   stageAtom,
+  resultAtom,
 } from '@/utils/store';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+// import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 interface Parameter {
@@ -29,7 +42,11 @@ const ChooseParameters: React.FC = () => {
   const [selectedGoalParameterList, setSelectedGoalParameterList] = useAtom(
     selectedGoalParameterListAtom
   );
+  const [result, setResult] = useAtom(resultAtom);
   const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [errorTitle, setErrorTitle] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     handleFetchParameterList();
@@ -42,27 +59,42 @@ const ChooseParameters: React.FC = () => {
       : setDisableConfigure(true);
   }, [selectedInitialParameterList, selectedGoalParameterList]);
 
-  const handleFetchParameterList = () => {
-    setToBeSelectedInitialParamList([
-      { id: 1, label: 'USB 2.0', name: 'i1' },
-      { id: 2, label: 'USB 3.0', name: 'i2' },
-      { id: 3, label: 'Display Port 1.2', name: 'i3' },
-      { id: 4, label: 'Display Port 1.4', name: 'i4' },
-      { id: 5, label: 'HDMI 1.4', name: 'i5' },
-      { id: 6, label: 'HDMI 2.0', name: 'i6' },
-      { id: 7, label: 'PCIe 4.0', name: 'i7' },
-      { id: 8, label: 'PCIe 5.0', name: 'i8' },
-    ]);
-    setToBeSelectedGoalParamList([
-      { id: 1, label: 'USB 2.0', name: 'i1' },
-      { id: 2, label: 'USB 3.0', name: 'i2' },
-      { id: 3, label: 'Display Port 1.2', name: 'i3' },
-      { id: 4, label: 'Display Port 1.4', name: 'i4' },
-      { id: 5, label: 'HDMI 1.4', name: 'i5' },
-      { id: 6, label: 'HDMI 2.0', name: 'i6' },
-      { id: 7, label: 'PCIe 4.0', name: 'i7' },
-      { id: 8, label: 'PCIe 5.0', name: 'i8' },
-    ]);
+  const handleFetchParameterList = async () => {
+    const response = await fetch('http://127.0.0.1:8002/api/parameters/');
+    const data = await response.json();
+
+    if (response.ok) {
+      // console.log(data);
+      const transformedData = data.map((item) => ({
+        id: item.parameterid, // Use parameterid for id
+        label: item.parametername, // Use parametername for label
+        name: item.parameterid, // Use parameterid for name
+      }));
+
+      setToBeSelectedInitialParamList(transformedData);
+      setToBeSelectedGoalParamList(transformedData);
+    }
+
+    // setToBeSelectedInitialParamList([
+    //   { id: 1, label: 'USB 2.0', name: 'i1' },
+    //   { id: 2, label: 'USB 3.0', name: 'i2' },
+    //   { id: 3, label: 'Display Port 1.2', name: 'i3' },
+    //   { id: 4, label: 'Display Port 1.4', name: 'i4' },
+    //   { id: 5, label: 'HDMI 1.4', name: 'i5' },
+    //   { id: 6, label: 'HDMI 2.0', name: 'i6' },
+    //   { id: 7, label: 'PCIe 4.0', name: 'i7' },
+    //   { id: 8, label: 'PCIe 5.0', name: 'i8' },
+    // ]);
+    // setToBeSelectedGoalParamList([
+    //   { id: 1, label: 'USB 2.0', name: 'i1' },
+    //   { id: 2, label: 'USB 3.0', name: 'i2' },
+    //   { id: 3, label: 'Display Port 1.2', name: 'i3' },
+    //   { id: 4, label: 'Display Port 1.4', name: 'i4' },
+    //   { id: 5, label: 'HDMI 1.4', name: 'i5' },
+    //   { id: 6, label: 'HDMI 2.0', name: 'i6' },
+    //   { id: 7, label: 'PCIe 4.0', name: 'i7' },
+    //   { id: 8, label: 'PCIe 5.0', name: 'i8' },
+    // ]);
   };
 
   const handleMoveAllInitialParams = () => {
@@ -133,6 +165,11 @@ const ChooseParameters: React.FC = () => {
     );
   };
 
+  const handleReset = () => {
+    handleClearAllInitialParams();
+    handleClearAllGoalParams();
+  };
+
   function getCookie(name) {
     const cookieValue = document.cookie
       .split('; ')
@@ -143,6 +180,10 @@ const ChooseParameters: React.FC = () => {
 
   const handleConfigure = async () => {
     setStage(1);
+    const selectedInitialsIds = selectedInitialParameterList.map(
+      (item) => item.id
+    );
+    const selectedGoalIds = selectedGoalParameterList.map((item) => item.id);
     const csrfToken = getCookie('csrftoken');
     const response = await fetch('http://127.0.0.1:8002/api/get_result', {
       method: 'POST',
@@ -151,8 +192,10 @@ const ChooseParameters: React.FC = () => {
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
-        initials: ['pr2', 'pr4'],
-        knowledges: ['pr6', 'pr7'],
+        initials: ['pr1'],
+        // initials: selectedInitialsIds,
+        goals: ['pr7'],
+        // goals: selectedGoalIds,
         depth: '0',
         child: '0',
       }),
@@ -162,10 +205,33 @@ const ChooseParameters: React.FC = () => {
 
     if (response.ok) {
       console.log('API Response:', data);
+      if (data.results && data.results.length > 0) {
+        setResult(data.results);
+        router.push('/tool');
+      } else {
+        setErrorTitle('Solution not found');
+        setErrorMessage(
+          'There is no feasible solution for the Initial and Goal Parameters chosen.'
+        );
+        setShowDialog(true);
+      }
     } else {
       console.error('API Error:', data);
+      if (
+        data.error ==
+        'Parameter ID not found: Parameterlist matching query does not exist.'
+      ) {
+        setErrorTitle('Error: Parameter not found');
+        setErrorMessage(
+          'The chosen parameters do not exist in the database, Please choose other parameters.'
+        );
+        setShowDialog(true);
+      } else {
+        setErrorTitle('Error Occurred');
+        setErrorMessage(data.error);
+        setShowDialog(true);
+      }
     }
-    router.push('/tool');
   };
 
   // const handleConfigure = async () => {
@@ -315,6 +381,22 @@ const ChooseParameters: React.FC = () => {
           Configure Systems
         </button>
       </div>
+
+      {/* Alert Dialog */}
+      <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{errorTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleReset}>Reset</AlertDialogCancel>
+            <AlertDialogAction onClick={() => setShowDialog(false)}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 };

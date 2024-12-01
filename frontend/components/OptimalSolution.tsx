@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import {
   Tooltip,
   TooltipContent,
@@ -6,6 +8,8 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { ReactFlow, Background, Controls, Edge, Node } from '@xyflow/react';
+import { useAtom } from 'jotai';
+import { resultAtom } from '@/utils/store';
 import '@xyflow/react/dist/style.css';
 import CustomNode from './CustomNode';
 
@@ -97,6 +101,144 @@ interface OptimalSolutionProps {
 }
 
 const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
+  const [result, setResult] = useAtom(resultAtom);
+  const [nodes, setNodes] = useState([
+    {
+      id: '1',
+      type: 'custom',
+      position: { x: 50, y: 0 },
+      data: {
+        label: 'Source\nServer',
+        leftInterface: 'i1',
+        rightInterface: 'i2\ni3',
+      },
+    },
+    {
+      id: '2',
+      type: 'custom',
+      position: { x: 300, y: -50 },
+      data: {
+        label: 'Primary\nStorage',
+        leftInterface: 'i2',
+        rightInterface: 'i5',
+      },
+    },
+    {
+      id: '3',
+      type: 'custom',
+      position: { x: 300, y: 100 },
+      data: {
+        label: 'Secondary\nStorage',
+        leftInterface: 'i3',
+        rightInterface: 'i4',
+      },
+    },
+    {
+      id: '4',
+      type: 'custom',
+      position: { x: 550, y: 25 },
+      data: {
+        label: 'Read\nReplica',
+        leftInterface: 'i5\ni4',
+        rightInterface: 'i7',
+      },
+    },
+  ]);
+  const [edges, setEdges] = useState([
+    {
+      id: 'e1-2',
+      source: '1',
+      target: '2',
+      sourceHandle: 'i2',
+      targetHandle: 'i2',
+      style: { strokeDasharray: '5,5' },
+    },
+    {
+      id: 'e1-3',
+      source: '1',
+      target: '3',
+      sourceHandle: 'i3',
+      targetHandle: 'i3',
+      style: { strokeDasharray: '5,5' },
+    },
+    {
+      id: 'e2-4',
+      source: '2',
+      target: '4',
+      sourceHandle: 'i5',
+      targetHandle: 'i5',
+      style: { strokeDasharray: '5,5' },
+    },
+    {
+      id: 'e3-4',
+      source: '3',
+      target: '4',
+      sourceHandle: 'i4',
+      targetHandle: 'i4',
+      style: { strokeDasharray: '5,5' },
+    },
+  ]);
+  // const [nodeTypes, setNodeTypes] = useState([]);
+
+  function convertToDiagram(json: WebService[]): {
+    nodes: Node[];
+    edges: Edge[];
+  } {
+    const stagePositions = {
+      1: { x: 50, y: 0 },
+      2: { x: 300, y: 0 },
+      3: { x: 550, y: 0 },
+    };
+    const verticalSpacing = 150;
+
+    const nodes: Node[] = json.map((service, index) => {
+      const position = {
+        x: stagePositions[service.stage]?.x || 0,
+        y: stagePositions[service.stage]?.y + index * verticalSpacing,
+      };
+
+      return {
+        id: service.webserviceid,
+        type: 'custom',
+        position,
+        data: {
+          label: service.webservicename,
+          leftInterface: `i${service.stage}`,
+          rightInterface: `i${service.stage + 1}`,
+        },
+      };
+    });
+
+    const edges: Edge[] = [
+      {
+        id: 'e1-2',
+        source: '1',
+        target: '2',
+        style: { strokeDasharray: '5,5' },
+      },
+      {
+        id: 'e1-3',
+        source: '1',
+        target: '3',
+        style: { strokeDasharray: '5,5' },
+      },
+      {
+        id: 'e2-4',
+        source: '2',
+        target: '4',
+        style: { strokeDasharray: '5,5' },
+      },
+      {
+        id: 'e3-4',
+        source: '3',
+        target: '4',
+        style: { strokeDasharray: '5,5' },
+      },
+    ];
+
+    return { nodes, edges };
+  }
+
   return (
     <section className='mt-5'>
       <div className='border-gray-300 bg-gray-50 border rounded-2xl p-10'>
@@ -124,8 +266,8 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
         >
           <div style={{ height: '100%', width: '100%' }}>
             <ReactFlow
-              nodes={initialNodes}
-              edges={initialEdges}
+              nodes={nodes}
+              edges={edges}
               nodeTypes={nodeTypes}
               fitView
               className='bg-gray-50'
