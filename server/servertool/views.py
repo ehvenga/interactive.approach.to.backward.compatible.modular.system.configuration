@@ -105,47 +105,87 @@ def write_knowledge_to_table(transactID, parameter_ids, iorg):
 class GetResultView(View):
     def post(self, request):
         try:
-            data = json.loads(request.body)  # Parse the JSON body
-            initials = data.get('initials', [])
-            goals = data.get('goals', [])
-            depth = data.get('depth', '0')
-            child = data.get('child', '0')
+            data = json.loads(request.body)
+            initials, goals, depth, child = self.parse_request_data(data)
 
-            if not initials or not goals:
-                return JsonResponse({'error': 'Initials or goals are missing'}, status=400)
+            transactID = self.generate_transaction_id()
 
-            if has_common_member(initials, goals):
-                return JsonResponse({'error': 'Initials and goals should not overlap'}, status=400)
+            self.write_initials_and_goals(transactID, initials, goals)
 
-            # Generate transaction ID
-            random.seed()
-            transactID = random.randint(9000000, 10000000)
+            self.run_external_process(transactID, depth, child)
 
-            # Write initials and goals to the database
-            write_knowledge_to_table(transactID, initials, 'I')
-            write_knowledge_to_table(transactID, goals, 'G')
+            results = self.fetch_results(transactID)
 
-            # Run external Java process
-            subprocess.call(['java', '-jar', 'C:\\AutoPlan\\AutoWSC-AIPSYooMath.jar', str(transactID), depth, child])
-
-            # Fetch results
-            lCourseObj = []
-            resultList = Result.objects.filter(transactionid=transactID).order_by('stage')
-            
-            for res in resultList:
-              course = Webservicelist.objects.get(webserviceid=res.webserviceid)
-              course_dict = model_to_dict(course)  # Convert the course object to a dictionary
-              course_dict['stage'] = res.stage  # Add the stage to the dictionary
-              lCourseObj.append(course_dict)  # Append the updated dictionary to the list
-
-            # Return results as JSON
             return JsonResponse({
-              'transactionID': transactID,
-              'results': lCourseObj
+                'transactionID': transactID,
+                'results': results
             }, status=200)
 
-        except Parameterlist.DoesNotExist as e:
-            return JsonResponse({'error': f'Parameter ID not found: {str(e)}'}, status=400)
+        except ValueError as ve:
+            return JsonResponse({'error': str(ve)}, status=400)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
+    def parse_request_data(self, data):
+        initials = data.get('initials', [])
+        goals = data.get('goals', [])
+        depth = data.get('depth', '0')
+        child = data.get('child', '0')
+
+        if not initials or not goals:
+            raise ValueError('Initials or goals are missing')
+
+        if has_common_member(initials, goals):
+            raise ValueError('Initials and goals should not overlap')
+
+        return initials, goals, depth, child
+
+    def generate_transaction_id(self):
+        random.seed()
+        return random.randint(9000000, 10000000)
+
+    def write_initials_and_goals(self, transactID, initials, goals):
+        write_knowledge_to_table(transactID, initials, 'I')
+        write_knowledge_to_table(transactID, goals, 'G')
+
+    def run_external_process(self, transactID, depth, child):
+        subprocess.call([
+            'java', '-jar', 'C:\\AutoPlan\\AutoWSC-AIPSYooMath.jar',
+            str(transactID), depth, child
+        ])
+
+    def fetch_results(self, transactID):
+        lCourseObj = []
+        resultList = Result.objects.filter(transactionid=transactID).order_by('stage')
+
+        webservice_ids = [res.webserviceid for res in resultList]
+        courses = Webservicelist.objects.filter(webserviceid__in=webservice_ids)
+        courses_dict = {course.webserviceid: course for course in courses}
+
+        input_params = Inputparameter.objects.filter(webserviceid__in=webservice_ids)
+        output_params = Outputparameter.objects.filter(webserviceid__in=webservice_ids)
+
+        # Build dictionaries mapping webserviceid to list of parameterids
+        input_params_dict = {}
+        for ip in input_params:
+            input_params_dict.setdefault(ip.webserviceid, []).append(ip.parameterid)
+
+        output_params_dict = {}
+        for op in output_params:
+            output_params_dict.setdefault(op.webserviceid, []).append(op.parameterid)
+
+        for res in resultList:
+            webserviceid = res.webserviceid
+            course = courses_dict.get(webserviceid)
+            if not course:
+                continue  # Skip if course not found
+
+            course_dict = model_to_dict(course)
+            course_dict['stage'] = res.stage
+            course_dict['input_parameters'] = input_params_dict.get(webserviceid, [])
+            course_dict['output_parameters'] = output_params_dict.get(webserviceid, [])
+
+            lCourseObj.append(course_dict)
+
+        return lCourseObj
