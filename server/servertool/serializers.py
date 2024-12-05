@@ -12,6 +12,11 @@ class WebServiceListSerializer(serializers.ModelSerializer):
         model = Webservicelist
         fields = '__all__'
 
+class WebServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Webservicelist
+        fields = ('webserviceid', 'webservicename')
+
 class OutputParameterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Outputparameter

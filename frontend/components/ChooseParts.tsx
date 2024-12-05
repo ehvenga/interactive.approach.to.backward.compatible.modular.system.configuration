@@ -13,6 +13,7 @@ import {
   partsListAtom,
   partsChosenListAtom,
   viewSolutionAtom,
+  partsFromParametersAtom,
 } from '@/utils/store';
 import { useRouter } from 'next/navigation';
 
@@ -29,33 +30,32 @@ const ChooseParts: React.FC = () => {
   const [partsList, setPartsList] = useAtom(partsListAtom);
   const [partsChosenList, setPartsChosenList] = useAtom(partsChosenListAtom);
   const [viewSolution, setViewSolution] = useAtom(viewSolutionAtom);
+  const [partsFromParameters, setPartsFromParameters] = useAtom(
+    partsFromParametersAtom
+  );
 
   useEffect(() => {
-    setPartsList([
-      { id: 1, label: 'Controller', name: 'p1' },
-      { id: 2, label: 'VR Headset', name: 'p2' },
-      { id: 3, label: 'Laptop', name: 'p3' },
-      { id: 4, label: 'Monitor', name: 'p4' },
-      { id: 5, label: 'Capture Card', name: 'p5' },
-    ]);
-  }, [setPartsList]);
+    setPartsList(partsFromParameters);
+  }, [partsFromParameters]);
 
   const handleTogglePart = (part: Parts) => {
     setPartsChosenList((prevList) => {
-      if (prevList.find((p) => p.id === part.id)) {
-        return prevList.filter((p) => p.id !== part.id);
+      if (prevList.find((p) => p.webserviceid === part.webserviceid)) {
+        return prevList.filter((p) => p.webserviceid !== part.webserviceid);
       }
       return [...prevList, part];
     });
   };
 
   const handleConfigure = () => {
-    setStage(2);
+    // setStage(2);
     router.push('/solution');
   };
 
   const isChosen = (part: Parts): boolean => {
-    return partsChosenList.some((chosen) => chosen.id === part.id);
+    return partsChosenList.some(
+      (chosen) => chosen.webserviceid === part.webserviceid
+    );
   };
 
   return (
@@ -88,10 +88,10 @@ const ChooseParts: React.FC = () => {
                     ? 'bg-gray-300 text-gray-500 hover:bg-red-300 hover:text-white'
                     : 'bg-gray-100 hover:bg-gray-50 hover:font-medium hover:text-green-500'
                 }`}
-              key={part.id}
+              key={part.webserviceid}
               onClick={() => handleTogglePart(part)}
             >
-              {part.label}
+              {part.webservicename}
             </div>
           ))}
         </div>

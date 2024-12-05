@@ -20,4 +20,6 @@ export const selectedGoalParameterListAtom = atom<Parameter[]>([]);
 export const partsListAtom = atom<Parts[]>([]);
 export const partsChosenListAtom = atom<Parts[]>([]);
 export const viewSolutionAtom = atom<boolean>(false);
-export const resultAtom = atom([]);
+export const optimalResultAtom = atom([]);
+export const partsFromParametersAtom = atom([]);
+export const currentSolutionAtom = atom([]);

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+'use client';
+
+import React, { useEffect, useState, useRef } from 'react';
 import { useAtom } from 'jotai';
 import {
   toBeSelectedInitialParamListAtom,
@@ -6,7 +8,7 @@ import {
   toBeSelectedGoalParamListAtom,
   selectedGoalParameterListAtom,
   stageAtom,
-  resultAtom,
+  optimalResultAtom,
 } from '@/utils/store';
 import {
   AlertDialog,
@@ -30,6 +32,7 @@ interface Parameter {
 
 const ChooseParameters: React.FC = () => {
   const router = useRouter();
+  const isFirstRender = useRef(true);
 
   const [stage, setStage] = useAtom(stageAtom);
   const [toBeSelectedInitialParamList, setToBeSelectedInitialParamList] =
@@ -42,14 +45,17 @@ const ChooseParameters: React.FC = () => {
   const [selectedGoalParameterList, setSelectedGoalParameterList] = useAtom(
     selectedGoalParameterListAtom
   );
-  const [result, setResult] = useAtom(resultAtom);
+  const [optimalResult, optimalSetResult] = useAtom(optimalResultAtom);
   const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [errorTitle, setErrorTitle] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
-    handleFetchParameterList();
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      handleFetchParameterList();
+    }
   }, []);
 
   useEffect(() => {
@@ -74,27 +80,6 @@ const ChooseParameters: React.FC = () => {
       setToBeSelectedInitialParamList(transformedData);
       setToBeSelectedGoalParamList(transformedData);
     }
-
-    // setToBeSelectedInitialParamList([
-    //   { id: 1, label: 'USB 2.0', name: 'i1' },
-    //   { id: 2, label: 'USB 3.0', name: 'i2' },
-    //   { id: 3, label: 'Display Port 1.2', name: 'i3' },
-    //   { id: 4, label: 'Display Port 1.4', name: 'i4' },
-    //   { id: 5, label: 'HDMI 1.4', name: 'i5' },
-    //   { id: 6, label: 'HDMI 2.0', name: 'i6' },
-    //   { id: 7, label: 'PCIe 4.0', name: 'i7' },
-    //   { id: 8, label: 'PCIe 5.0', name: 'i8' },
-    // ]);
-    // setToBeSelectedGoalParamList([
-    //   { id: 1, label: 'USB 2.0', name: 'i1' },
-    //   { id: 2, label: 'USB 3.0', name: 'i2' },
-    //   { id: 3, label: 'Display Port 1.2', name: 'i3' },
-    //   { id: 4, label: 'Display Port 1.4', name: 'i4' },
-    //   { id: 5, label: 'HDMI 1.4', name: 'i5' },
-    //   { id: 6, label: 'HDMI 2.0', name: 'i6' },
-    //   { id: 7, label: 'PCIe 4.0', name: 'i7' },
-    //   { id: 8, label: 'PCIe 5.0', name: 'i8' },
-    // ]);
   };
 
   const handleMoveAllInitialParams = () => {
@@ -204,9 +189,9 @@ const ChooseParameters: React.FC = () => {
     const data = await response.json();
 
     if (response.ok) {
-      console.log('API Response:', data);
+      // console.log('API Response:', data);
       if (data.results && data.results.length > 0) {
-        setResult(data.results);
+        optimalSetResult(data.results);
         router.push('/tool');
       } else {
         setErrorTitle('Solution not found');
@@ -233,31 +218,6 @@ const ChooseParameters: React.FC = () => {
       }
     }
   };
-
-  // const handleConfigure = async () => {
-  //   const csrfToken = getCookie('csrftoken'); // Ensure CSRF cookie is available
-  //   const response = await fetch('http://127.0.0.1:8002/api/get_result/', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'X-CSRFToken': csrfToken,
-  //     },
-  //     body: JSON.stringify({
-  //       initials: ['PR1', 'PR3'], // Initials parameter
-  //       knowledges: ['PR7', 'PR8'], // Goals parameter
-  //       depth: '0', // Depth parameter
-  //       child: '0', // Child parameter
-  //     }),
-  //   });
-
-  //   const data = await response.json();
-
-  //   if (response.ok) {
-  //     console.log('API Response:', data);
-  //   } else {
-  //     console.error('API Error:', data);
-  //   }
-  // };
 
   return (
     <section>

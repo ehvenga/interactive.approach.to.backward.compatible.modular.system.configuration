@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/tooltip';
 import { ReactFlow, Background, Controls, Edge, Node } from '@xyflow/react';
 import { useAtom } from 'jotai';
-import { resultAtom } from '@/utils/store';
+import { optimalResultAtom } from '@/utils/store';
 import '@xyflow/react/dist/style.css';
 import CustomNode from './CustomNode';
 
@@ -17,127 +17,33 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'custom',
-    position: { x: 50, y: 0 },
-    data: {
-      label: 'Joystick\nController',
-      leftInterface: 'i1',
-      rightInterface: 'i2',
-    },
-  },
-  {
-    id: '2',
-    type: 'custom',
-    position: { x: 50, y: 150 },
-    data: {
-      label: 'VR Headset',
-      leftInterface: 'i1',
-      rightInterface: 'i4',
-    },
-  },
-  {
-    id: '3',
-    type: 'custom',
-    position: { x: 350, y: 75 },
-    data: {
-      label: 'Gaming\nConsole',
-      leftInterface: 'i3\ni5',
-      rightInterface: 'i7\ni8',
-    },
-  },
-  {
-    id: '4',
-    type: 'custom',
-    position: { x: 650, y: 0 },
-    data: {
-      label: 'Monitor',
-      leftInterface: 'i6',
-    },
-  },
-  {
-    id: '5',
-    type: 'custom',
-    position: { x: 650, y: 150 },
-    data: {
-      label: 'Capture\nCard',
-      leftInterface: 'i9',
-      rightInterface: 'i7',
-    },
-  },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: 'e1-3',
-    source: '1',
-    target: '3',
-    style: { strokeDasharray: '5,5' },
-  },
-  {
-    id: 'e2-3',
-    source: '2',
-    target: '3',
-    style: { strokeDasharray: '5,5' },
-  },
-  {
-    id: 'e3-4',
-    source: '3',
-    target: '4',
-    style: { strokeDasharray: '5,5' },
-  },
-  {
-    id: 'e3-5',
-    source: '3',
-    target: '5',
-    style: { strokeDasharray: '5,5' },
-  },
-];
-
 interface OptimalSolutionProps {
   type: 'sm' | 'md' | 'xl';
 }
 
+type WebService = {
+  webserviceid: string;
+  webservicename: string;
+  reputation: number;
+  price: number;
+  duration: number;
+  provider: string;
+  url: string;
+  stage: number;
+};
+
 const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
-  const [result, setResult] = useAtom(resultAtom);
+  const [optimalResult, setOptimalResult] = useAtom(optimalResultAtom);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+
   // const [nodeTypes, setNodeTypes] = useState([]);
 
   useEffect(() => {
-    const diagram = convertToDynamicDiagram(result);
+    const diagram = convertToDynamicDiagram(optimalResult);
     setNodes(diagram.nodes);
     setEdges(diagram.edges);
-  }, [result]);
-
-  type WebService = {
-    webserviceid: string;
-    webservicename: string;
-    reputation: number;
-    price: number;
-    duration: number;
-    provider: string;
-    url: string;
-    stage: number;
-  };
-
-  type Node = {
-    id: string;
-    type: string;
-    position: { x: number; y: number };
-    data: { label: string; leftInterface?: string; rightInterface?: string };
-  };
-
-  type Edge = {
-    id: string;
-    source: string;
-    target: string;
-    sourceHandle?: string;
-    targetHandle?: string;
-    style?: { strokeDasharray: string };
-  };
+  }, [optimalResult]);
 
   function convertToDynamicDiagram(json: WebService[]): {
     nodes: Node[];

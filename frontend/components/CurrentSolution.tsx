@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   Tooltip,
   TooltipContent,
@@ -9,7 +9,11 @@ import {
 } from '@/components/ui/tooltip';
 import { ReactFlow, Background, Controls, Edge, Node } from '@xyflow/react';
 import { useAtom } from 'jotai';
-import { resultAtom } from '@/utils/store';
+import {
+  optimalResultAtom,
+  partsFromParametersAtom,
+  stageAtom,
+} from '@/utils/store';
 import '@xyflow/react/dist/style.css';
 import CustomNode from './CustomNode';
 
@@ -17,121 +21,80 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
-const initialNodes: Node[] = [
-  {
-    id: '1',
-    type: 'custom',
-    position: { x: 50, y: 0 },
-    data: {
-      label: 'Joystick\nController',
-      leftInterface: 'i1',
-      rightInterface: 'i2',
-    },
-  },
-  {
-    id: '2',
-    type: 'custom',
-    position: { x: 50, y: 150 },
-    data: {
-      label: 'VR Headset',
-      leftInterface: 'i1',
-      rightInterface: 'i4',
-    },
-  },
-  {
-    id: '3',
-    type: 'custom',
-    position: { x: 350, y: 75 },
-    data: {
-      label: 'Gaming\nConsole',
-      leftInterface: 'i3\ni5',
-      rightInterface: 'i7\ni8',
-    },
-  },
-  {
-    id: '4',
-    type: 'custom',
-    position: { x: 650, y: 0 },
-    data: {
-      label: 'Monitor',
-      leftInterface: 'i6',
-    },
-  },
-  {
-    id: '5',
-    type: 'custom',
-    position: { x: 650, y: 150 },
-    data: {
-      label: 'Capture\nCard',
-      leftInterface: 'i9',
-      rightInterface: 'i7',
-    },
-  },
-];
-
-const initialEdges: Edge[] = [
-  {
-    id: 'e1-3',
-    source: '1',
-    target: '3',
-    style: { strokeDasharray: '5,5' },
-  },
-  {
-    id: 'e2-3',
-    source: '2',
-    target: '3',
-    style: { strokeDasharray: '5,5' },
-  },
-  {
-    id: 'e3-4',
-    source: '3',
-    target: '4',
-    style: { strokeDasharray: '5,5' },
-  },
-  {
-    id: 'e3-5',
-    source: '3',
-    target: '5',
-    style: { strokeDasharray: '5,5' },
-  },
-];
+type WebService = {
+  webserviceid: string;
+  webservicename: string;
+  reputation: number;
+  price: number;
+  duration: number;
+  provider: string;
+  url: string;
+  stage: number;
+};
 
 const CurrentSolution: React.FC = () => {
-  const [result, setResult] = useAtom(resultAtom);
+  const [optimalResult, optimalSetResult] = useAtom(optimalResultAtom);
+  const [partsFromParameters, setPartsFromParameters] = useAtom(
+    partsFromParametersAtom
+  );
+  const [stage, setStage] = useAtom(stageAtom);
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [filteredResult, setFilteredResult] = useState([]);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    const diagram = convertToDynamicDiagram(result);
+    if (filteredResult.length > 0) {
+      handleFetchPartsForParameters();
+    }
+  }, [filteredResult]);
+
+  useEffect(() => {
+    const filtered_data = optimalResult.filter((item) => item?.stage === stage);
+    setFilteredResult(filtered_data);
+    const diagram = convertToDynamicDiagram(filtered_data);
     setNodes(diagram.nodes);
     setEdges(diagram.edges);
-  }, [result]);
+  }, [optimalResult]);
 
-  type WebService = {
-    webserviceid: string;
-    webservicename: string;
-    reputation: number;
-    price: number;
-    duration: number;
-    provider: string;
-    url: string;
-    stage: number;
-  };
+  function getCookie(name) {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith(name + '='))
+      ?.split('=')[1];
+    return cookieValue || '';
+  }
 
-  type Node = {
-    id: string;
-    type: string;
-    position: { x: number; y: number };
-    data: { label: string; leftInterface?: string; rightInterface?: string };
-  };
+  const handleFetchPartsForParameters = async () => {
+    const csrfToken = getCookie('csrftoken');
+    const uniqueOutputParameters = [
+      ...new Set(filteredResult.flatMap((item) => item.output_parameters)),
+    ];
+    try {
+      const response = await fetch(
+        'http://127.0.0.1:8002/api/parameters/filter/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({
+            parameters: uniqueOutputParameters, // Pass the selected parameter IDs
+          }),
+        }
+      );
 
-  type Edge = {
-    id: string;
-    source: string;
-    target: string;
-    sourceHandle?: string;
-    targetHandle?: string;
-    style?: { strokeDasharray: string };
+      const data = await response.json();
+
+      if (response.ok) {
+        setPartsFromParameters(data);
+      } else {
+        console.error('something went wrong');
+      }
+    } catch (error) {
+      console.error('error:', error);
+    }
   };
 
   function convertToDynamicDiagram(json: WebService[]): {
@@ -182,33 +145,48 @@ const CurrentSolution: React.FC = () => {
           },
           data: {
             label: service.webservicename,
-            leftInterface: `i${service.stage}`,
-            rightInterface: `i${service.stage + 1}`,
+            inputParameters: service.input_parameters,
+            outputParameters: service.output_parameters,
           },
         });
       });
     });
 
-    // Create edges (connect nodes from previous stages to the current one)
+    // Create edges based on matching parameters
     const edges: Edge[] = [];
-    Object.keys(groupedByStage).forEach((stageKey) => {
-      const stage = parseInt(stageKey);
-      if (!groupedByStage[stage + 1]) return;
 
-      const currentStageServices = groupedByStage[stage];
-      const nextStageServices = groupedByStage[stage + 1];
+    // Get all stages
+    const stages = Object.keys(groupedByStage)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    // For each pair of consecutive stages
+    for (let i = 0; i < stages.length - 1; i++) {
+      const currentStage = stages[i];
+      const nextStage = stages[i + 1];
+
+      const currentStageServices = groupedByStage[currentStage];
+      const nextStageServices = groupedByStage[nextStage];
 
       currentStageServices.forEach((sourceService) => {
         nextStageServices.forEach((targetService) => {
-          edges.push({
-            id: `e${sourceService.webserviceid}-${targetService.webserviceid}`,
-            source: sourceService.webserviceid,
-            target: targetService.webserviceid,
-            style: { strokeDasharray: '5,5' },
-          });
+          // Check if any output parameter of the source matches any input parameter of the target
+          const matchingParameters = sourceService.output_parameters.filter(
+            (param) => targetService.input_parameters.includes(param)
+          );
+
+          if (matchingParameters.length > 0) {
+            edges.push({
+              id: `e${sourceService.webserviceid}-${targetService.webserviceid}`,
+              source: sourceService.webserviceid,
+              target: targetService.webserviceid,
+              label: matchingParameters.join(', '), // Optionally, label the edge with matching parameters
+              style: { strokeDasharray: '5,5' },
+            });
+          }
         });
       });
-    });
+    }
 
     return { nodes, edges };
   }

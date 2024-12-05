@@ -10,7 +10,7 @@ from django.views import View
 from django.forms.models import model_to_dict
 import json
 from .models import Inputparameter, Webservicelist, Outputparameter, Initialgoalparameter, Parameterlist, Result
-from .serializers import InputParameterSerializer, WebServiceListSerializer, OutputParameterSerializer, InitialGoalParameterSerializer, ParameterListSerializer
+from .serializers import InputParameterSerializer, WebServiceListSerializer, OutputParameterSerializer, InitialGoalParameterSerializer, ParameterListSerializer, WebServiceSerializer
 
 
 class InputParameterListView(APIView):
@@ -81,6 +81,41 @@ class ParameterListView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class FilteredWebServiceView(APIView):
+    def post(self, request):
+        # Get the list of parameters from the request
+        parameters = request.data.get('parameters', [])
+        if not parameters or not isinstance(parameters, list):
+            return Response(
+                {"error": "Please provide a valid list of parameters."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Find matching web service IDs
+        input_matches = Inputparameter.objects.filter(parameterid__in=parameters).values_list('webserviceid', flat=True)
+        # output_matches = Outputparameter.objects.filter(parameterid__in=parameters).values_list('webserviceid', flat=True)
+
+        # Combine and remove duplicates
+        webservice_ids = set(input_matches)
+
+        # Fetch corresponding web services
+        web_services = Webservicelist.objects.filter(webserviceid__in=webservice_ids)
+        serializer = WebServiceSerializer(web_services, many=True)
+
+        # Attach input and output parameters to each web service
+        response_data = []
+        for service in web_services:
+            input_params = Inputparameter.objects.filter(webserviceid=service.webserviceid).values_list('parameterid', flat=True)
+            output_params = Outputparameter.objects.filter(webserviceid=service.webserviceid).values_list('parameterid', flat=True)
+            response_data.append({
+                "webserviceid": service.webserviceid,
+                "webservicename": service.webservicename,
+                "input_parameters": list(input_params),
+                "output_parameters": list(output_params),
+            })
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 def has_common_member(list1, list2):
