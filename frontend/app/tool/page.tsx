@@ -14,6 +14,7 @@ const Tool: React.FC = () => {
         <CurrentSolution />
         <ChooseParts />
       </div>
+      {/* Show optimal solution as a reference. You can hide or conditionally show later. */}
       <OptimalSolution type='sm' />
     </main>
   );

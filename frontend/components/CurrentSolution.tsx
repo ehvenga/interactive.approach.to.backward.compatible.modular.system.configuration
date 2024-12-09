@@ -1,19 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import React, { useEffect, useState } from 'react';
 import { ReactFlow, Background, Controls, Edge, Node } from '@xyflow/react';
 import { useAtom } from 'jotai';
-import {
-  optimalResultAtom,
-  partsFromParametersAtom,
-  stageAtom,
-} from '@/utils/store';
+import { partsChosenListAtom, currentSolutionAtom } from '@/utils/store';
 import '@xyflow/react/dist/style.css';
 import CustomNode from './CustomNode';
 
@@ -21,88 +11,47 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
+interface CurrentSolutionProps {
+  type: 'sm' | 'md' | 'xl';
+}
+
 type WebService = {
   webserviceid: string;
   webservicename: string;
-  reputation: number;
-  price: number;
-  duration: number;
-  provider: string;
-  url: string;
+  input_parameters: string[];
+  output_parameters: string[];
   stage: number;
 };
 
-const CurrentSolution: React.FC = () => {
-  const [optimalResult, optimalSetResult] = useAtom(optimalResultAtom);
-  const [partsFromParameters, setPartsFromParameters] = useAtom(
-    partsFromParametersAtom
-  );
-  const [stage, setStage] = useAtom(stageAtom);
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
-  const [filteredResult, setFilteredResult] = useState([]);
-  const isFirstRender = useRef(true);
+const CurrentSolution: React.FC<CurrentSolutionProps> = ({ type }) => {
+  const [currentSolution] = useAtom(currentSolutionAtom);
+  const [partsChosenList] = useAtom(partsChosenListAtom);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
 
   useEffect(() => {
-    if (filteredResult.length > 0) {
-      handleFetchPartsForParameters();
+    // Combine previously chosen parts and currently chosen parts
+    const combinedParts = [...currentSolution, ...partsChosenList];
+    if (combinedParts.length > 0) {
+      const diagram = convertToDynamicDiagram(combinedParts);
+      setNodes(diagram.nodes);
+      setEdges(diagram.edges);
+    } else {
+      setNodes([]);
+      setEdges([]);
     }
-  }, [filteredResult]);
-
-  useEffect(() => {
-    const filtered_data = optimalResult.filter((item) => item?.stage === stage);
-    setFilteredResult(filtered_data);
-    const diagram = convertToDynamicDiagram(filtered_data);
-    setNodes(diagram.nodes);
-    setEdges(diagram.edges);
-  }, [optimalResult]);
-
-  function getCookie(name) {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith(name + '='))
-      ?.split('=')[1];
-    return cookieValue || '';
-  }
-
-  const handleFetchPartsForParameters = async () => {
-    const csrfToken = getCookie('csrftoken');
-    const uniqueOutputParameters = [
-      ...new Set(filteredResult.flatMap((item) => item.output_parameters)),
-    ];
-    try {
-      const response = await fetch(
-        'http://127.0.0.1:8002/api/parameters/filter/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-          },
-          body: JSON.stringify({
-            parameters: uniqueOutputParameters, // Pass the selected parameter IDs
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setPartsFromParameters(data);
-      } else {
-        console.error('something went wrong');
-      }
-    } catch (error) {
-      console.error('error:', error);
-    }
-  };
+  }, [currentSolution, partsChosenList]);
 
   function convertToDynamicDiagram(json: WebService[]): {
     nodes: Node[];
     edges: Edge[];
   } {
+    if (!json || json.length === 0) {
+      return { nodes: [], edges: [] };
+    }
+
     const xSpacing = 250; // Horizontal spacing between stages
-    const ySpacing = 150; // Vertical spacing for multiple items in a stage
+    const ySpacing = 150; // Vertical spacing between nodes in a stage
 
     // Group services by stage
     const groupedByStage = json.reduce<Record<number, WebService[]>>(
@@ -114,18 +63,25 @@ const CurrentSolution: React.FC = () => {
       {}
     );
 
+    const stages = Object.keys(groupedByStage)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    if (stages.length === 0) {
+      return { nodes: [], edges: [] };
+    }
+
     // Find the maximum number of nodes in any stage
     const maxNodesInStage = Math.max(
       ...Object.values(groupedByStage).map((services) => services.length)
     );
-
-    // Calculate total height based on the maximum number of nodes
     const totalHeight = (maxNodesInStage - 1) * ySpacing;
 
     // Create nodes
     const nodes: Node[] = [];
-    Object.keys(groupedByStage).forEach((stageKey) => {
-      const stage = parseInt(stageKey);
+    const nodeMap: Record<string, WebService> = {};
+
+    stages.forEach((stage) => {
       const services = groupedByStage[stage];
       const nodesInStage = services.length;
 
@@ -134,65 +90,98 @@ const CurrentSolution: React.FC = () => {
           nodesInStage > 1
             ? ((index - (nodesInStage - 1) / 2) * totalHeight) /
               (maxNodesInStage - 1)
-            : 0; // Center single node
+            : 0;
 
         nodes.push({
           id: service.webserviceid,
           type: 'custom',
-          position: {
-            x: stage * xSpacing,
-            y: y,
-          },
+          position: { x: stage * xSpacing, y },
           data: {
             label: service.webservicename,
-            inputParameters: service.input_parameters,
-            outputParameters: service.output_parameters,
+            inputParameters: service.input_parameters || [],
+            outputParameters: service.output_parameters || [],
           },
         });
+        nodeMap[service.webserviceid] = service;
       });
     });
 
-    // Create edges based on matching parameters
+    // Build a parameter -> producers map
+    const paramToProducers: Record<string, string[]> = {};
+    for (const node of nodes) {
+      const service = nodeMap[node.id];
+      for (const outParam of service.output_parameters) {
+        if (!paramToProducers[outParam]) {
+          paramToProducers[outParam] = [];
+        }
+        // Add this node as a producer of outParam
+        paramToProducers[outParam].push(service.webserviceid);
+      }
+    }
+
+    // Track the availability of output parameters for each node
+    // nodeOutputs[nodeId][param] = how many times this parameter can still be used
+    const nodeOutputs: Record<string, Record<string, number>> = {};
+    for (const node of nodes) {
+      const service = nodeMap[node.id];
+      nodeOutputs[node.id] = {};
+      for (const outParam of service.output_parameters) {
+        if (!nodeOutputs[node.id][outParam]) {
+          nodeOutputs[node.id][outParam] = 0;
+        }
+        nodeOutputs[node.id][outParam] += 1;
+      }
+    }
+
     const edges: Edge[] = [];
+    const edgeSet = new Set<string>(); // to avoid duplicates
 
-    // Get all stages
-    const stages = Object.keys(groupedByStage)
-      .map(Number)
-      .sort((a, b) => a - b);
+    // Connect inputs from any previous stage node that still has that output param available
+    for (const node of nodes) {
+      const currentService = nodeMap[node.id];
+      const nodeStage = currentService.stage;
 
-    // For each pair of consecutive stages
-    for (let i = 0; i < stages.length - 1; i++) {
-      const currentStage = stages[i];
-      const nextStage = stages[i + 1];
+      for (const inParam of currentService.input_parameters) {
+        const producers = paramToProducers[inParam] || [];
+        // We need to find a producer that has this param still available (unused)
+        // and is from an earlier stage
+        let connected = false;
+        for (const producerNodeId of producers) {
+          const producerService = nodeMap[producerNodeId];
+          if (producerService && producerService.stage < nodeStage) {
+            // Check if producer still has outParam available
+            if (
+              nodeOutputs[producerNodeId][inParam] &&
+              nodeOutputs[producerNodeId][inParam] > 0
+            ) {
+              // Use this param once
+              nodeOutputs[producerNodeId][inParam] -= 1;
 
-      const currentStageServices = groupedByStage[currentStage];
-      const nextStageServices = groupedByStage[nextStage];
-
-      currentStageServices.forEach((sourceService) => {
-        nextStageServices.forEach((targetService) => {
-          // Check if any output parameter of the source matches any input parameter of the target
-          const matchingParameters = sourceService.output_parameters.filter(
-            (param) => targetService.input_parameters.includes(param)
-          );
-
-          if (matchingParameters.length > 0) {
-            edges.push({
-              id: `e${sourceService.webserviceid}-${targetService.webserviceid}`,
-              source: sourceService.webserviceid,
-              target: targetService.webserviceid,
-              label: matchingParameters.join(', '), // Optionally, label the edge with matching parameters
-              style: { strokeDasharray: '5,5' },
-            });
+              const edgeId = `e${producerNodeId}-${currentService.webserviceid}-${inParam}`;
+              if (!edgeSet.has(edgeId)) {
+                edges.push({
+                  id: edgeId,
+                  source: producerNodeId,
+                  target: currentService.webserviceid,
+                  label: inParam,
+                  style: { strokeDasharray: '5,5' },
+                });
+                edgeSet.add(edgeId);
+              }
+              connected = true;
+              break; // Stop after finding one available producer
+            }
           }
-        });
-      });
+        }
+        // If no available producer found, no edge for this param
+      }
     }
 
     return { nodes, edges };
   }
 
   return (
-    <section className='w-3/5'>
+    <section className={`${type == 'xl' ? 'w-full' : 'w-3/5'}`}>
       <div className='border-gray-300 bg-gray-50 border rounded-2xl p-10'>
         <div className='flex border-b-2 gap-x-2'>
           <h2 className='text-xl text-gray-600 font-semibold'>

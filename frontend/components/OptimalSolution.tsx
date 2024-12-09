@@ -1,12 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import { ReactFlow, Background, Controls, Edge, Node } from '@xyflow/react';
 import { useAtom } from 'jotai';
 import { optimalResultAtom } from '@/utils/store';
@@ -24,35 +18,33 @@ interface OptimalSolutionProps {
 type WebService = {
   webserviceid: string;
   webservicename: string;
-  reputation: number;
-  price: number;
-  duration: number;
-  provider: string;
-  url: string;
+  input_parameters: string[];
+  output_parameters: string[];
   stage: number;
 };
 
 const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
-  const [optimalResult, setOptimalResult] = useAtom(optimalResultAtom);
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
-
-  // const [nodeTypes, setNodeTypes] = useState([]);
+  const [optimalResult] = useAtom(optimalResultAtom);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
 
   useEffect(() => {
-    const diagram = convertToDynamicDiagram(optimalResult);
-    setNodes(diagram.nodes);
-    setEdges(diagram.edges);
+    if (optimalResult && optimalResult.length > 0) {
+      const diagram = convertToDynamicDiagram(optimalResult);
+      setNodes(diagram.nodes);
+      setEdges(diagram.edges);
+    } else {
+      setNodes([]);
+      setEdges([]);
+    }
   }, [optimalResult]);
 
   function convertToDynamicDiagram(json: WebService[]): {
     nodes: Node[];
     edges: Edge[];
   } {
-    const xSpacing = 250; // Horizontal spacing between stages
-    const ySpacing = 150; // Vertical spacing for multiple items in a stage
-
-    // Group services by stage
+    const xSpacing = 250;
+    const ySpacing = 150;
     const groupedByStage = json.reduce<Record<number, WebService[]>>(
       (acc, service) => {
         acc[service.stage] = acc[service.stage] || [];
@@ -62,15 +54,11 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
       {}
     );
 
-    // Find the maximum number of nodes in any stage
     const maxNodesInStage = Math.max(
       ...Object.values(groupedByStage).map((services) => services.length)
     );
-
-    // Calculate total height based on the maximum number of nodes
     const totalHeight = (maxNodesInStage - 1) * ySpacing;
 
-    // Create nodes
     const nodes: Node[] = [];
     Object.keys(groupedByStage).forEach((stageKey) => {
       const stage = parseInt(stageKey);
@@ -82,7 +70,7 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
           nodesInStage > 1
             ? ((index - (nodesInStage - 1) / 2) * totalHeight) /
               (maxNodesInStage - 1)
-            : 0; // Center single node
+            : 0;
 
         nodes.push({
           id: service.webserviceid,
@@ -100,15 +88,11 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
       });
     });
 
-    // Create edges based on matching parameters
     const edges: Edge[] = [];
-
-    // Get all stages
     const stages = Object.keys(groupedByStage)
       .map(Number)
       .sort((a, b) => a - b);
 
-    // For each pair of consecutive stages
     for (let i = 0; i < stages.length - 1; i++) {
       const currentStage = stages[i];
       const nextStage = stages[i + 1];
@@ -118,7 +102,6 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
 
       currentStageServices.forEach((sourceService) => {
         nextStageServices.forEach((targetService) => {
-          // Check if any output parameter of the source matches any input parameter of the target
           const matchingParameters = sourceService.output_parameters.filter(
             (param) => targetService.input_parameters.includes(param)
           );
@@ -128,7 +111,7 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
               id: `e${sourceService.webserviceid}-${targetService.webserviceid}`,
               source: sourceService.webserviceid,
               target: targetService.webserviceid,
-              label: matchingParameters.join(', '), // Optionally, label the edge with matching parameters
+              label: matchingParameters.join(', '),
               style: { strokeDasharray: '5,5' },
             });
           }
@@ -146,18 +129,6 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type }) => {
           <h2 className='text-xl text-gray-600 font-semibold'>
             Optimal Solution
           </h2>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <span className='border border-gray-400 px-[7px] rounded-full text-sm -translate-y-2'>
-                  i
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>A preview of current optimal solution</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
         <div
           className={`bg-white ${

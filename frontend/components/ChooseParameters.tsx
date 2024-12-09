@@ -9,6 +9,9 @@ import {
   selectedGoalParameterListAtom,
   stageAtom,
   optimalResultAtom,
+  initialIDAtom,
+  goalIDAtom,
+  partsFromParametersAtom,
 } from '@/utils/store';
 import {
   AlertDialog,
@@ -21,7 +24,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-// import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 interface Parameter {
@@ -46,10 +48,15 @@ const ChooseParameters: React.FC = () => {
     selectedGoalParameterListAtom
   );
   const [optimalResult, optimalSetResult] = useAtom(optimalResultAtom);
-  const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
+  const [initialIDs, setInitialIDs] = useAtom(initialIDAtom);
+  const [goalIDs, setGoalIDs] = useAtom(goalIDAtom);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [errorTitle, setErrorTitle] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
+  const [partsFromParameters, setPartsFromParameters] = useAtom(
+    partsFromParametersAtom
+  );
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -70,11 +77,10 @@ const ChooseParameters: React.FC = () => {
     const data = await response.json();
 
     if (response.ok) {
-      // console.log(data);
       const transformedData = data.map((item) => ({
-        id: item.parameterid, // Use parameterid for id
-        label: item.parametername, // Use parametername for label
-        name: item.parameterid, // Use parameterid for name
+        id: item.parameterid,
+        label: item.parametername,
+        name: item.parameterid,
       }));
 
       setToBeSelectedInitialParamList(transformedData);
@@ -164,11 +170,13 @@ const ChooseParameters: React.FC = () => {
   }
 
   const handleConfigure = async () => {
-    setStage(1);
+    setStage(0);
     const selectedInitialsIds = selectedInitialParameterList.map(
       (item) => item.id
     );
     const selectedGoalIds = selectedGoalParameterList.map((item) => item.id);
+    setInitialIDs(selectedInitialsIds);
+    setGoalIDs(selectedGoalIds);
     const csrfToken = getCookie('csrftoken');
     const response = await fetch('http://127.0.0.1:8002/api/get_result', {
       method: 'POST',
@@ -177,9 +185,7 @@ const ChooseParameters: React.FC = () => {
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
-        // initials: ['pr1'],
         initials: selectedInitialsIds,
-        // goals: ['pr7'],
         goals: selectedGoalIds,
         depth: '0',
         child: '0',
@@ -189,16 +195,31 @@ const ChooseParameters: React.FC = () => {
     const data = await response.json();
 
     if (response.ok) {
-      // console.log('API Response:', data);
-      if (data.results && data.results.length > 0) {
-        optimalSetResult(data.results);
+      optimalSetResult(data.results);
+      // Now fetch the parts for the initial parameters
+      const partsResponse = await fetch(
+        'http://127.0.0.1:8002/api/parameters/filter/',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({
+            parameters: selectedInitialsIds,
+          }),
+        }
+      );
+      const partsData = await partsResponse.json();
+      if (partsResponse.ok) {
+        const partsDataWithStage = partsData.map((part: any) => ({
+          ...part,
+          stage: 0,
+        }));
+        setPartsFromParameters(partsDataWithStage);
         router.push('/tool');
       } else {
-        setErrorTitle('Solution not found');
-        setErrorMessage(
-          'There is no feasible solution for the Initial and Goal Parameters chosen.'
-        );
-        setShowDialog(true);
+        console.error('Error fetching initial parts');
       }
     } else {
       console.error('API Error:', data);
@@ -226,6 +247,7 @@ const ChooseParameters: React.FC = () => {
           Select Interface Parameters
         </h2>
 
+        {/* Initial Parameter Selection */}
         <div className='flex gap-3 mt-6'>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
@@ -280,6 +302,7 @@ const ChooseParameters: React.FC = () => {
           </div>
         </div>
 
+        {/* Goal Parameter Selection */}
         <div className='flex gap-3 mt-6'>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
@@ -322,7 +345,7 @@ const ChooseParameters: React.FC = () => {
               </h3>
               {selectedGoalParameterList.map((param, idx) => (
                 <div
-                  className='bg-gray-100 hover:bg-gray-50 hover:font-medium hover:text-red-500 h-8 flex items=center cursor-pointer px-2'
+                  className='bg-gray-100 hover:bg-gray-50 hover:font-medium hover:text-red-500 h-8 flex items-center cursor-pointer px-2'
                   key={idx}
                   onClick={() => handleSelectedGoalInputParamClicked(param)}
                 >

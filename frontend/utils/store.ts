@@ -23,3 +23,7 @@ export const viewSolutionAtom = atom<boolean>(false);
 export const optimalResultAtom = atom([]);
 export const partsFromParametersAtom = atom([]);
 export const currentSolutionAtom = atom([]);
+export const maxAllowedToBeSelectedPartsAtom = atom(50);
+export const initialIDAtom = atom([]);
+export const goalIDAtom = atom([]);
+export const isGoalAchievedAtom = atom<boolean>(false);
