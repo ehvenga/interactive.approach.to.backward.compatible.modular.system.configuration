@@ -7,7 +7,7 @@ import Navbar from '@/components/navbar';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Autoblox: An Interactive Approach',
+  title: 'Auto-M-Design: An Interactive Approach',
   description: 'Solve your system configuration problems with Autoblox',
 };
 

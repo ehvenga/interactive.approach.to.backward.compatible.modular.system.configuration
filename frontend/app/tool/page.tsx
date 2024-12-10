@@ -11,7 +11,7 @@ const Tool: React.FC = () => {
         Interactive Configuration Tool
       </h1>
       <div className='flex gap-x-5'>
-        <CurrentSolution />
+        <CurrentSolution type='sm' />
         <ChooseParts />
       </div>
       {/* Show optimal solution as a reference. You can hide or conditionally show later. */}

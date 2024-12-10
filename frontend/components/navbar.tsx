@@ -13,7 +13,7 @@ const Navbar = () => {
         />
         <Image
           src='/logo-letter.png'
-          width={180}
+          width={220}
           height={30}
           alt='Picture of the author'
           className='-mt-[2px]'
