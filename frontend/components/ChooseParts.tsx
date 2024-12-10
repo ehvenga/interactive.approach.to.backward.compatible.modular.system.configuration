@@ -11,6 +11,8 @@ import {
   currentSolutionAtom,
   goalIDAtom,
   isGoalAchievedAtom,
+  optimalResultAtom, // To update cumulative optimal solution
+  initialIDAtom,
 } from '@/utils/store';
 import { useRouter } from 'next/navigation';
 
@@ -36,6 +38,9 @@ const ChooseParts: React.FC = () => {
   const [currentSolution, setCurrentSolution] = useAtom(currentSolutionAtom);
   const [goalIDs] = useAtom(goalIDAtom);
   const [isGoalAchieved, setIsGoalAchieved] = useAtom(isGoalAchievedAtom);
+  const [optimalResult, optimalSetResult] = useAtom(optimalResultAtom);
+
+  const [initialIDs] = useAtom(initialIDAtom);
 
   const [handleConfigDisable, setHandleConfigDisable] = useState(true);
 
@@ -44,13 +49,11 @@ const ChooseParts: React.FC = () => {
   }, [partsFromParameters]);
 
   useEffect(() => {
-    // If no parts chosen, disable the configuration.
     if (partsChosenList.length === 0) {
       setHandleConfigDisable(true);
       return;
     }
 
-    // If parts chosen are within allowed limit and not zero, enable configuration.
     if (
       partsChosenList.length <= maxAllowedToBeSelectedParts &&
       partsChosenList.length > 0
@@ -58,7 +61,6 @@ const ChooseParts: React.FC = () => {
       setHandleConfigDisable(false);
     } else {
       if (maxAllowedToBeSelectedParts === 0 && partsChosenList.length > 0) {
-        // Possibly goal reached
         setHandleConfigDisable(false);
       } else {
         setHandleConfigDisable(true);
@@ -100,7 +102,6 @@ const ChooseParts: React.FC = () => {
         updatedList = [...prevList, part];
       }
 
-      // Check goal immediately after updating the chosen list
       if (checkGoalAchievement(updatedList)) {
         setIsGoalAchieved(true);
       } else {
@@ -115,7 +116,6 @@ const ChooseParts: React.FC = () => {
     // Append currently chosen parts to the cumulative currentSolution
     setCurrentSolution((prev) => [...prev, ...partsChosenList]);
 
-    // If we reach here, it means goal wasn't achieved at part selection time
     const chosenOutputs = [
       ...new Set(partsChosenList.flatMap((item) => item.output_parameters)),
     ];
@@ -145,6 +145,51 @@ const ChooseParts: React.FC = () => {
       setPartsFromParameters(partsDataWithStage);
       setPartsChosenList([]);
       setMaxAllowedToBeSelectedParts(chosenOutputs.length);
+
+      // Now call get_result again with the new "initials" = chosenOutputs
+      // to update the optimal solution chain.
+      const resultResponse = await fetch(
+        'http://127.0.0.1:8002/api/get_result',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({
+            initials: chosenOutputs,
+            goals: goalIDs,
+            depth: '0',
+            child: '0',
+          }),
+        }
+      );
+
+      const newOptimalData = await resultResponse.json();
+      if (resultResponse.ok) {
+        // Adjust stages of returned optimal result by adding current global stage
+        // This ensures a continuous chain of stages.
+        const adjustedOptimalData = newOptimalData.results.map((svc: any) => ({
+          ...svc,
+          stage: svc.stage + newStage,
+        }));
+
+        // Merge the new optimal chain into the existing one
+        // Remove duplicates by webserviceid
+        const combinedOptimal = [...optimalResult, ...adjustedOptimalData];
+        const uniqueOptimal = [
+          ...new Map(
+            combinedOptimal.map((item: any) => [item.webserviceid, item])
+          ).values(),
+        ];
+
+        optimalSetResult(uniqueOptimal);
+      } else {
+        console.error(
+          'Error updating optimal solution at new stage:',
+          newOptimalData
+        );
+      }
     } else {
       console.error('Error fetching next stage parts');
     }
@@ -160,7 +205,6 @@ const ChooseParts: React.FC = () => {
     );
   };
 
-  // Filter partsList so that it doesn't include parts already in currentSolution or partsChosenList
   const filteredPartsList = partsList.filter(
     (part) =>
       !currentSolution.some((cs) => cs.webserviceid === part.webserviceid) &&

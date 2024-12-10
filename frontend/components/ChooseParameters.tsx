@@ -12,6 +12,7 @@ import {
   initialIDAtom,
   goalIDAtom,
   partsFromParametersAtom,
+  currentSolutionAtom,
 } from '@/utils/store';
 import {
   AlertDialog,
@@ -22,7 +23,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
 
@@ -50,13 +50,17 @@ const ChooseParameters: React.FC = () => {
   const [optimalResult, optimalSetResult] = useAtom(optimalResultAtom);
   const [initialIDs, setInitialIDs] = useAtom(initialIDAtom);
   const [goalIDs, setGoalIDs] = useAtom(goalIDAtom);
+  const [partsFromParameters, setPartsFromParameters] = useAtom(
+    partsFromParametersAtom
+  );
+
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [errorTitle, setErrorTitle] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [disableConfigure, setDisableConfigure] = useState<boolean>(true);
-  const [partsFromParameters, setPartsFromParameters] = useAtom(
-    partsFromParametersAtom
-  );
+
+  // Add currentSolution atom to clear if needed
+  const [currentSolution, setCurrentSolution] = useAtom(currentSolutionAtom);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -159,6 +163,7 @@ const ChooseParameters: React.FC = () => {
   const handleReset = () => {
     handleClearAllInitialParams();
     handleClearAllGoalParams();
+    setCurrentSolution([]); // reset chosen parts if needed
   };
 
   function getCookie(name) {
@@ -177,6 +182,7 @@ const ChooseParameters: React.FC = () => {
     const selectedGoalIds = selectedGoalParameterList.map((item) => item.id);
     setInitialIDs(selectedInitialsIds);
     setGoalIDs(selectedGoalIds);
+
     const csrfToken = getCookie('csrftoken');
     const response = await fetch('http://127.0.0.1:8002/api/get_result', {
       method: 'POST',
@@ -195,7 +201,9 @@ const ChooseParameters: React.FC = () => {
     const data = await response.json();
 
     if (response.ok) {
+      // This is the initial optimal solution from original initials to goals
       optimalSetResult(data.results);
+
       // Now fetch the parts for the initial parameters
       const partsResponse = await fetch(
         'http://127.0.0.1:8002/api/parameters/filter/',
@@ -217,6 +225,7 @@ const ChooseParameters: React.FC = () => {
           stage: 0,
         }));
         setPartsFromParameters(partsDataWithStage);
+        // Reset any previously chosen solution
         router.push('/tool');
       } else {
         console.error('Error fetching initial parts');
