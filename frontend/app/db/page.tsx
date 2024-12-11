@@ -60,18 +60,18 @@ export default function Database() {
   const [newPart, setNewPart] = useState<Partial<Part>>({});
   const [deletePartId, setDeletePartId] = useState<string>('');
 
-  // Form states for parameters
+  // Form states for interface
   const [newParameter, setNewParameter] = useState<Partial<Parameter>>({});
   const [deleteParameterId, setDeleteParameterId] = useState<string>('');
 
-  // Form states for input parameters
+  // Form states for input interface
   const [newInputParam, setNewInputParam] = useState<
     Partial<InputOutputParameter>
   >({});
   const [deleteInputPartId, setDeleteInputPartId] = useState<string>('');
   const [deleteInputParamId, setDeleteInputParamId] = useState<string>('');
 
-  // Form states for output parameters
+  // Form states for output interface
   const [newOutputParam, setNewOutputParam] = useState<
     Partial<InputOutputParameter>
   >({});
@@ -185,7 +185,7 @@ export default function Database() {
     }
   };
 
-  // Add/Delete Input Parameter
+  // Add/Delete Input Interface
   const handleAddInputParam = async () => {
     try {
       const response = await fetch(
@@ -196,7 +196,7 @@ export default function Database() {
           body: JSON.stringify(newInputParam),
         }
       );
-      if (!response.ok) throw new Error('Failed to add input parameter');
+      if (!response.ok) throw new Error('Failed to add input interface');
       setNewInputParam({});
       refetchAll();
     } catch (error: any) {
@@ -213,7 +213,7 @@ export default function Database() {
           method: 'DELETE',
         }
       );
-      if (!response.ok) throw new Error('Failed to delete input parameter');
+      if (!response.ok) throw new Error('Failed to delete input interface');
       setDeleteInputPartId('');
       setDeleteInputParamId('');
       refetchAll();
@@ -222,7 +222,7 @@ export default function Database() {
     }
   };
 
-  // Add/Delete Output Parameter
+  // Add/Delete Output Interface
   const handleAddOutputParam = async () => {
     try {
       const response = await fetch(
@@ -233,7 +233,7 @@ export default function Database() {
           body: JSON.stringify(newOutputParam),
         }
       );
-      if (!response.ok) throw new Error('Failed to add output parameter');
+      if (!response.ok) throw new Error('Failed to add output interface');
       setNewOutputParam({});
       refetchAll();
     } catch (error: any) {
@@ -250,7 +250,7 @@ export default function Database() {
           method: 'DELETE',
         }
       );
-      if (!response.ok) throw new Error('Failed to delete output parameter');
+      if (!response.ok) throw new Error('Failed to delete output interface');
       setDeleteOutputPartId('');
       setDeleteOutputParamId('');
       refetchAll();
@@ -452,10 +452,10 @@ export default function Database() {
 
   const renderParameterList = () => (
     <>
-      <SectionCard title='Add Parameter'>
+      <SectionCard title='Add Interface'>
         <FormRow>
           <Label htmlFor='param-id' className='w-32'>
-            Parameter ID
+            Interface ID
           </Label>
           <Input
             id='param-id'
@@ -467,7 +467,7 @@ export default function Database() {
             className='w-32'
           />
           <Label htmlFor='param-name' className='w-32'>
-            Parameter Name
+            Interface Name
           </Label>
           <Input
             id='param-name'
@@ -485,10 +485,10 @@ export default function Database() {
         </FormRow>
       </SectionCard>
 
-      <SectionCard title='Delete Parameter'>
+      <SectionCard title='Delete Interface'>
         <FormRow>
           <Label htmlFor='del-param-id' className='w-32'>
-            Parameter ID
+            Interface ID
           </Label>
           <Input
             id='del-param-id'
@@ -508,8 +508,8 @@ export default function Database() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className='text-black'>Parameter ID</TableHead>
-            <TableHead className='text-black'>Parameter Name</TableHead>
+            <TableHead className='text-black'>Interface ID</TableHead>
+            <TableHead className='text-black'>Interface Name</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -526,7 +526,7 @@ export default function Database() {
 
   const renderInputParameterList = () => (
     <>
-      <SectionCard title='Add Input Parameter'>
+      <SectionCard title='Add Input Interface'>
         <FormRow>
           <Label htmlFor='inpart-id' className='w-32'>
             Part ID
@@ -544,7 +544,7 @@ export default function Database() {
             className='w-32'
           />
           <Label htmlFor='inparam-id' className='w-32'>
-            Param ID
+            Interface ID
           </Label>
           <Input
             id='inparam-id'
@@ -562,7 +562,7 @@ export default function Database() {
         </FormRow>
       </SectionCard>
 
-      <SectionCard title='Delete Input Parameter'>
+      <SectionCard title='Delete Input Interface'>
         <FormRow>
           <Label htmlFor='del-inpart-id' className='w-32'>
             Part ID
@@ -575,7 +575,7 @@ export default function Database() {
             className='w-32'
           />
           <Label htmlFor='del-inparam-id' className='w-32'>
-            Param ID
+            Interface ID
           </Label>
           <Input
             id='del-inparam-id'
@@ -596,7 +596,7 @@ export default function Database() {
         <TableHeader>
           <TableRow>
             <TableHead className='text-black'>Part ID</TableHead>
-            <TableHead className='text-black'>Parameter ID</TableHead>
+            <TableHead className='text-black'>Interface ID</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -613,7 +613,7 @@ export default function Database() {
 
   const renderOutputParameterList = () => (
     <>
-      <SectionCard title='Add Output Parameter'>
+      <SectionCard title='Add Output Interface'>
         <FormRow>
           <Label htmlFor='outpart-id' className='w-32'>
             Part ID
@@ -631,7 +631,7 @@ export default function Database() {
             className='w-32'
           />
           <Label htmlFor='outparam-id' className='w-32'>
-            Param ID
+            Interface ID
           </Label>
           <Input
             id='outparam-id'
@@ -649,7 +649,7 @@ export default function Database() {
         </FormRow>
       </SectionCard>
 
-      <SectionCard title='Delete Output Parameter'>
+      <SectionCard title='Delete Output Interface'>
         <FormRow>
           <Label htmlFor='del-outpart-id' className='w-32'>
             Part ID
@@ -662,7 +662,7 @@ export default function Database() {
             className='w-32'
           />
           <Label htmlFor='del-outparam-id' className='w-32'>
-            Param ID
+            Interface ID
           </Label>
           <Input
             id='del-outparam-id'
@@ -683,7 +683,7 @@ export default function Database() {
         <TableHeader>
           <TableRow>
             <TableHead className='text-black'>Part ID</TableHead>
-            <TableHead className='text-black'>Parameter ID</TableHead>
+            <TableHead className='text-black'>Interface ID</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -704,7 +704,7 @@ export default function Database() {
         <TableRow>
           <TableHead className='text-black'>Transaction ID</TableHead>
           <TableHead className='text-black'>IORG</TableHead>
-          <TableHead className='text-black'>Parameter ID</TableHead>
+          <TableHead className='text-black'>Interface ID</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

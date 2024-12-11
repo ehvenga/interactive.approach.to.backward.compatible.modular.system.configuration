@@ -119,7 +119,7 @@ const CurrentSolution: React.FC<CurrentSolutionProps> = ({ type }) => {
       }
     }
 
-    // Track the availability of output parameters for each node
+    // Track the availability of output interface for each node
     // nodeOutputs[nodeId][param] = how many times this parameter can still be used
     const nodeOutputs: Record<string, Record<string, number>> = {};
     for (const node of nodes) {
