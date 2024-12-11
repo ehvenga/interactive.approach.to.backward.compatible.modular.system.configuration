@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           message:
-            'Could not build an optimal chain to reach the goal parameters.',
+            'Could not build an optimal chain to reach the goal interfaces.',
         },
         { status: 400 }
       );

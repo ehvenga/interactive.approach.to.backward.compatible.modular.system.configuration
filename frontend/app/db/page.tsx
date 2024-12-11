@@ -734,25 +734,25 @@ export default function Database() {
             Parts List
           </TabsTrigger>
           <TabsTrigger className='hover:text-gray-700' value='parameterlist'>
-            Parameter List
+            Interface List
           </TabsTrigger>
           <TabsTrigger
             className='hover:text-gray-700'
             value='inputparameterlist'
           >
-            Input Parameter List
+            Input Interface List
           </TabsTrigger>
           <TabsTrigger
             className='hover:text-gray-700'
             value='outputparameterlist'
           >
-            Output Parameter List
+            Output Interface List
           </TabsTrigger>
           <TabsTrigger
             className='hover:text-gray-700'
             value='parameterhierarchy'
           >
-            Initial Goal Parameters
+            Initial Goal Interfaces
           </TabsTrigger>
         </TabsList>
 

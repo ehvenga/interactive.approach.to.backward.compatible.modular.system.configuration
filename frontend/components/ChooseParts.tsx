@@ -247,7 +247,7 @@ const ChooseParts: React.FC = () => {
               disabled={handleConfigDisable}
               onClick={handleConfigure}
             >
-              Continue Configuration
+              Continue Product Design
             </button>
           )}
         </div>

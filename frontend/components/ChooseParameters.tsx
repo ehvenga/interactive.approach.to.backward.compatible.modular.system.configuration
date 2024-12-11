@@ -253,14 +253,14 @@ const ChooseParameters: React.FC = () => {
     <section>
       <div className='border-gray-300 bg-gray-50 border rounded-2xl p-10'>
         <h2 className='text-xl text-gray-600 font-semibold border-b-2'>
-          Select Interface Parameters
+          Select Initial & Goal Interface
         </h2>
 
         {/* Initial Parameter Selection */}
         <div className='flex gap-3 mt-6'>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium text-gray-500'>Parameter List</h3>
+              <h3 className='font-medium text-gray-500'>Interface List</h3>
               <h4 className='text-sm'>
                 {toBeSelectedInitialParamList.length} items
               </h4>
@@ -286,7 +286,7 @@ const ChooseParameters: React.FC = () => {
 
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium text-gray-500'>Initial Parameters</h3>
+              <h3 className='font-medium text-gray-500'>Initial Interfaces</h3>
               <h4 className='text-sm'>
                 {selectedInitialParameterList.length} items
               </h4>
@@ -340,7 +340,7 @@ const ChooseParameters: React.FC = () => {
           </div>
           <div className='w-1/2'>
             <div className='flex justify-between border-b mb-2 items-end'>
-              <h3 className='font-medium text-gray-500'>Goal Parameters</h3>
+              <h3 className='font-medium text-gray-500'>Goal Interfaces</h3>
               <h4 className='text-sm'>
                 {selectedGoalParameterList.length} items
               </h4>

@@ -13,7 +13,7 @@ export default function Home() {
     <main className='px-24 py-10'>
       <div className='flex justify-between'>
         <h1 className='text-3xl font-semibold pb-4 text-gray-700'>
-          Interactive Configuration Tool
+          Interactive Design System
         </h1>
         <div className='flex items-center space-x-2'>
           <Switch id='airplane-mode' />

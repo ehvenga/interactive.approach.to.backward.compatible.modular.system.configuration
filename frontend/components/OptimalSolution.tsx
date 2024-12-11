@@ -179,7 +179,7 @@ const OptimalSolution: React.FC<OptimalSolutionProps> = ({ type = 'sm' }) => {
       <div className='border-gray-300 bg-gray-50 border rounded-2xl p-10'>
         <div className='flex border-b-2 gap-x-2'>
           <h2 className='text-xl text-gray-600 font-semibold'>
-            Optimal Solution
+            Optimal Design Solution
           </h2>
         </div>
         <div

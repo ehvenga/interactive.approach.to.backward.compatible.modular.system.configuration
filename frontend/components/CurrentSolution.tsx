@@ -185,7 +185,7 @@ const CurrentSolution: React.FC<CurrentSolutionProps> = ({ type }) => {
       <div className='border-gray-300 bg-gray-50 border rounded-2xl p-10'>
         <div className='flex border-b-2 gap-x-2'>
           <h2 className='text-xl text-gray-600 font-semibold'>
-            Current Solution
+            Current Design Solution
           </h2>
         </div>
         <div className='bg-white h-[60vh] mt-6 border-gray-200 border-2 rounded-md'>

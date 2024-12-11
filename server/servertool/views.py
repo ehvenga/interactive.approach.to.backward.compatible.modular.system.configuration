@@ -45,7 +45,7 @@ def write_knowledge_to_table(transactID, parameter_ids, iorg):
 #####################################
 class ParameterListView(APIView):
     def get(self, request):
-        parameters = Parameterlist.objects.filter(parameterid__startswith='pr')
+        parameters = Parameterlist.objects.filter(parameterid__startswith='i')
         serializer = ParameterListSerializer(parameters, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -103,7 +103,7 @@ class WebServiceDetailView(APIView):
 #####################################
 class InputParameterListView(APIView):
     def get(self, request):
-        input_parameters = Inputparameter.objects.filter(parameterid__startswith='pr')
+        input_parameters = Inputparameter.objects.filter(parameterid__startswith='i')
         serializer = InputParameterSerializer(input_parameters, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -131,7 +131,7 @@ class InputParameterDetailView(APIView):
 #####################################
 class OutputParameterListView(APIView):
     def get(self, request):
-        output_parameters = Outputparameter.objects.filter(parameterid__startswith='pr')
+        output_parameters = Outputparameter.objects.filter(parameterid__startswith='i')
         serializer = OutputParameterSerializer(output_parameters, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -162,7 +162,7 @@ class InitialGoalParameterListView(APIView):
         initial_goal_parameters = Initialgoalparameter.objects.all()
         filtered_parameters = [
             param for param in initial_goal_parameters
-            if param.parameterid.parameterid.startswith('pr')
+            if param.parameterid.parameterid.startswith('i')
         ]
         serializer = InitialGoalParameterSerializer(filtered_parameters, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
