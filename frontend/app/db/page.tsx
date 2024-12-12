@@ -273,7 +273,11 @@ export default function Database() {
   );
 
   const FormRow = ({ children }: { children: React.ReactNode }) => (
-    <div className='flex items-center space-x-3 flex-wrap'>{children}</div>
+    <div className='flex items-center space-x-20 flex-wrap'>{children}</div>
+  );
+
+  const Pair = ({ children }: { children: React.ReactNode }) => (
+    <div className='flex items-center space-x-2'>{children}</div>
   );
 
   const WideButton = ({
@@ -285,7 +289,7 @@ export default function Database() {
     variant?: 'default' | 'destructive';
     children: React.ReactNode;
   }) => (
-    <Button onClick={onClick} variant={variant} className='w-32'>
+    <Button onClick={onClick} variant={variant} className='w-28'>
       {children}
     </Button>
   );
@@ -293,108 +297,118 @@ export default function Database() {
   const renderPartList = () => (
     <>
       <SectionCard title='Add Part'>
-        {/* Row 1: Part ID, Part Name */}
         <FormRow>
-          <Label htmlFor='part-id' className='w-32'>
-            Part ID
-          </Label>
-          <Input
-            id='part-id'
-            value={newPart.webserviceid || ''}
-            onChange={(e) =>
-              setNewPart({ ...newPart, webserviceid: e.target.value })
-            }
-            placeholder='e.g. P1'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='part-id' className='w-28'>
+              Part ID
+            </Label>
+            <Input
+              id='part-id'
+              value={newPart.webserviceid || ''}
+              onChange={(e) =>
+                setNewPart({ ...newPart, webserviceid: e.target.value })
+              }
+              placeholder='e.g. P1'
+              className='w-32'
+            />
+          </Pair>
 
-          <Label htmlFor='part-name' className='w-32'>
-            Part Name
-          </Label>
-          <Input
-            id='part-name'
-            value={newPart.webservicename || ''}
-            onChange={(e) =>
-              setNewPart({ ...newPart, webservicename: e.target.value })
-            }
-            placeholder='e.g. Source Server'
-            className='w-48'
-          />
+          <Pair>
+            <Label htmlFor='part-name' className='w-28'>
+              Part Name
+            </Label>
+            <Input
+              id='part-name'
+              value={newPart.webservicename || ''}
+              onChange={(e) =>
+                setNewPart({ ...newPart, webservicename: e.target.value })
+              }
+              placeholder='e.g. Source Server'
+              className='w-48'
+            />
+          </Pair>
         </FormRow>
 
-        {/* Row 2: Reputation, Price */}
         <FormRow>
-          <Label htmlFor='rep' className='w-32'>
-            Reputation
-          </Label>
-          <Input
-            id='rep'
-            type='number'
-            value={newPart.reputation || ''}
-            onChange={(e) =>
-              setNewPart({ ...newPart, reputation: Number(e.target.value) })
-            }
-            placeholder='e.g. 4'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='rep' className='w-28'>
+              Reputation
+            </Label>
+            <Input
+              id='rep'
+              type='number'
+              value={newPart.reputation || ''}
+              onChange={(e) =>
+                setNewPart({ ...newPart, reputation: Number(e.target.value) })
+              }
+              placeholder='e.g. 4'
+              className='w-32'
+            />
+          </Pair>
 
-          <Label htmlFor='price' className='w-32'>
-            Price
-          </Label>
-          <Input
-            id='price'
-            type='number'
-            value={newPart.price || ''}
-            onChange={(e) =>
-              setNewPart({ ...newPart, price: Number(e.target.value) })
-            }
-            placeholder='e.g. 1000'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='price' className='w-28'>
+              Price
+            </Label>
+            <Input
+              id='price'
+              type='number'
+              value={newPart.price || ''}
+              onChange={(e) =>
+                setNewPart({ ...newPart, price: Number(e.target.value) })
+              }
+              placeholder='e.g. 1000'
+              className='w-32'
+            />
+          </Pair>
         </FormRow>
 
-        {/* Row 3: Duration, Provider */}
         <FormRow>
-          <Label htmlFor='dur' className='w-32'>
-            Duration
-          </Label>
-          <Input
-            id='dur'
-            type='number'
-            value={newPart.duration || ''}
-            onChange={(e) =>
-              setNewPart({ ...newPart, duration: Number(e.target.value) })
-            }
-            placeholder='e.g. 5'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='dur' className='w-28'>
+              Duration
+            </Label>
+            <Input
+              id='dur'
+              type='number'
+              value={newPart.duration || ''}
+              onChange={(e) =>
+                setNewPart({ ...newPart, duration: Number(e.target.value) })
+              }
+              placeholder='e.g. 5'
+              className='w-32'
+            />
+          </Pair>
 
-          <Label htmlFor='prov' className='w-32'>
-            Provider
-          </Label>
-          <Input
-            id='prov'
-            value={newPart.provider || ''}
-            onChange={(e) =>
-              setNewPart({ ...newPart, provider: e.target.value })
-            }
-            placeholder='e.g. CISCO'
-            className='w-48'
-          />
+          <Pair>
+            <Label htmlFor='prov' className='w-28'>
+              Provider
+            </Label>
+            <Input
+              id='prov'
+              value={newPart.provider || ''}
+              onChange={(e) =>
+                setNewPart({ ...newPart, provider: e.target.value })
+              }
+              placeholder='e.g. CISCO'
+              className='w-48'
+            />
+          </Pair>
         </FormRow>
 
-        {/* Row 4: URL, Add Button */}
         <FormRow>
-          <Label htmlFor='url' className='w-32'>
-            URL
-          </Label>
-          <Input
-            id='url'
-            value={newPart.url || ''}
-            onChange={(e) => setNewPart({ ...newPart, url: e.target.value })}
-            placeholder='e.g. cisco.com/server/z667db'
-            className='w-64'
-          />
+          <Pair>
+            <Label htmlFor='url' className='w-28'>
+              URL
+            </Label>
+            <Input
+              id='url'
+              value={newPart.url || ''}
+              onChange={(e) => setNewPart({ ...newPart, url: e.target.value })}
+              placeholder='e.g. cisco.com/server/z667db'
+              className='w-64'
+            />
+          </Pair>
         </FormRow>
         <FormRow>
           <WideButton onClick={handleAddPart}>Add</WideButton>
@@ -403,16 +417,18 @@ export default function Database() {
 
       <SectionCard title='Delete Part'>
         <FormRow>
-          <Label htmlFor='del-part-id' className='w-32'>
-            Part ID
-          </Label>
-          <Input
-            id='del-part-id'
-            value={deletePartId}
-            onChange={(e) => setDeletePartId(e.target.value)}
-            placeholder='e.g. P1'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='del-part-id' className='w-28'>
+              Part ID
+            </Label>
+            <Input
+              id='del-part-id'
+              value={deletePartId}
+              onChange={(e) => setDeletePartId(e.target.value)}
+              placeholder='e.g. P1'
+              className='w-32'
+            />
+          </Pair>
           <WideButton onClick={handleDeletePart} variant='destructive'>
             Delete
           </WideButton>
@@ -454,49 +470,58 @@ export default function Database() {
     <>
       <SectionCard title='Add Interface'>
         <FormRow>
-          <Label htmlFor='param-id' className='w-32'>
-            Interface ID
-          </Label>
-          <Input
-            id='param-id'
-            value={newParameter.parameterid || ''}
-            onChange={(e) =>
-              setNewParameter({ ...newParameter, parameterid: e.target.value })
-            }
-            placeholder='e.g. p1'
-            className='w-32'
-          />
-          <Label htmlFor='param-name' className='w-32'>
-            Interface Name
-          </Label>
-          <Input
-            id='param-name'
-            value={newParameter.parametername || ''}
-            onChange={(e) =>
-              setNewParameter({
-                ...newParameter,
-                parametername: e.target.value,
-              })
-            }
-            placeholder='e.g. p1name'
-            className='w-48'
-          />
+          <Pair>
+            <Label htmlFor='param-id' className='w-28'>
+              Interface ID
+            </Label>
+            <Input
+              id='param-id'
+              value={newParameter.parameterid || ''}
+              onChange={(e) =>
+                setNewParameter({
+                  ...newParameter,
+                  parameterid: e.target.value,
+                })
+              }
+              placeholder='e.g. p1'
+              className='w-32'
+            />
+          </Pair>
+          <Pair>
+            <Label htmlFor='param-name' className='w-28'>
+              Interface Name
+            </Label>
+            <Input
+              id='param-name'
+              value={newParameter.parametername || ''}
+              onChange={(e) =>
+                setNewParameter({
+                  ...newParameter,
+                  parametername: e.target.value,
+                })
+              }
+              placeholder='e.g. p1name'
+              className='w-48'
+            />
+          </Pair>
           <WideButton onClick={handleAddParameter}>Add</WideButton>
         </FormRow>
       </SectionCard>
 
       <SectionCard title='Delete Interface'>
         <FormRow>
-          <Label htmlFor='del-param-id' className='w-32'>
-            Interface ID
-          </Label>
-          <Input
-            id='del-param-id'
-            value={deleteParameterId}
-            onChange={(e) => setDeleteParameterId(e.target.value)}
-            placeholder='e.g. p1'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='del-param-id' className='w-28'>
+              Interface ID
+            </Label>
+            <Input
+              id='del-param-id'
+              value={deleteParameterId}
+              onChange={(e) => setDeleteParameterId(e.target.value)}
+              placeholder='e.g. p1'
+              className='w-32'
+            />
+          </Pair>
           <WideButton onClick={handleDeleteParameter} variant='destructive'>
             Delete
           </WideButton>
@@ -528,62 +553,70 @@ export default function Database() {
     <>
       <SectionCard title='Add Input Interface'>
         <FormRow>
-          <Label htmlFor='inpart-id' className='w-32'>
-            Part ID
-          </Label>
-          <Input
-            id='inpart-id'
-            value={newInputParam.webserviceid || ''}
-            onChange={(e) =>
-              setNewInputParam({
-                ...newInputParam,
-                webserviceid: e.target.value,
-              })
-            }
-            placeholder='e.g. P1'
-            className='w-32'
-          />
-          <Label htmlFor='inparam-id' className='w-32'>
-            Interface ID
-          </Label>
-          <Input
-            id='inparam-id'
-            value={newInputParam.parameterid || ''}
-            onChange={(e) =>
-              setNewInputParam({
-                ...newInputParam,
-                parameterid: e.target.value,
-              })
-            }
-            placeholder='e.g. p2'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='inpart-id' className='w-28'>
+              Part ID
+            </Label>
+            <Input
+              id='inpart-id'
+              value={newInputParam.webserviceid || ''}
+              onChange={(e) =>
+                setNewInputParam({
+                  ...newInputParam,
+                  webserviceid: e.target.value,
+                })
+              }
+              placeholder='e.g. P1'
+              className='w-32'
+            />
+          </Pair>
+          <Pair>
+            <Label htmlFor='inparam-id' className='w-28'>
+              Interface ID
+            </Label>
+            <Input
+              id='inparam-id'
+              value={newInputParam.parameterid || ''}
+              onChange={(e) =>
+                setNewInputParam({
+                  ...newInputParam,
+                  parameterid: e.target.value,
+                })
+              }
+              placeholder='e.g. p2'
+              className='w-32'
+            />
+          </Pair>
           <WideButton onClick={handleAddInputParam}>Add</WideButton>
         </FormRow>
       </SectionCard>
 
       <SectionCard title='Delete Input Interface'>
         <FormRow>
-          <Label htmlFor='del-inpart-id' className='w-32'>
-            Part ID
-          </Label>
-          <Input
-            id='del-inpart-id'
-            value={deleteInputPartId}
-            onChange={(e) => setDeleteInputPartId(e.target.value)}
-            placeholder='e.g. P1'
-            className='w-32'
-          />
-          <Label htmlFor='del-inparam-id' className='w-32'>
-            Interface ID
-          </Label>
-          <Input
-            id='del-inparam-id'
-            value={deleteInputParamId}
-            onChange={(e) => setDeleteInputParamId(e.target.value)}
-            placeholder='e.g. p2'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='del-inpart-id' className='w-28'>
+              Part ID
+            </Label>
+            <Input
+              id='del-inpart-id'
+              value={deleteInputPartId}
+              onChange={(e) => setDeleteInputPartId(e.target.value)}
+              placeholder='e.g. P1'
+              className='w-32'
+            />
+          </Pair>
+          <Pair>
+            <Label htmlFor='del-inparam-id' className='w-28'>
+              Interface ID
+            </Label>
+            <Input
+              id='del-inparam-id'
+              value={deleteInputParamId}
+              onChange={(e) => setDeleteInputParamId(e.target.value)}
+              placeholder='e.g. p2'
+              className='w-32'
+            />
+          </Pair>
           <WideButton onClick={handleDeleteInputParam} variant='destructive'>
             Delete
           </WideButton>
@@ -615,62 +648,70 @@ export default function Database() {
     <>
       <SectionCard title='Add Output Interface'>
         <FormRow>
-          <Label htmlFor='outpart-id' className='w-32'>
-            Part ID
-          </Label>
-          <Input
-            id='outpart-id'
-            value={newOutputParam.webserviceid || ''}
-            onChange={(e) =>
-              setNewOutputParam({
-                ...newOutputParam,
-                webserviceid: e.target.value,
-              })
-            }
-            placeholder='e.g. P1'
-            className='w-32'
-          />
-          <Label htmlFor='outparam-id' className='w-32'>
-            Interface ID
-          </Label>
-          <Input
-            id='outparam-id'
-            value={newOutputParam.parameterid || ''}
-            onChange={(e) =>
-              setNewOutputParam({
-                ...newOutputParam,
-                parameterid: e.target.value,
-              })
-            }
-            placeholder='e.g. p2'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='outpart-id' className='w-28'>
+              Part ID
+            </Label>
+            <Input
+              id='outpart-id'
+              value={newOutputParam.webserviceid || ''}
+              onChange={(e) =>
+                setNewOutputParam({
+                  ...newOutputParam,
+                  webserviceid: e.target.value,
+                })
+              }
+              placeholder='e.g. P1'
+              className='w-32'
+            />
+          </Pair>
+          <Pair>
+            <Label htmlFor='outparam-id' className='w-28'>
+              Interface ID
+            </Label>
+            <Input
+              id='outparam-id'
+              value={newOutputParam.parameterid || ''}
+              onChange={(e) =>
+                setNewOutputParam({
+                  ...newOutputParam,
+                  parameterid: e.target.value,
+                })
+              }
+              placeholder='e.g. p2'
+              className='w-32'
+            />
+          </Pair>
           <WideButton onClick={handleAddOutputParam}>Add</WideButton>
         </FormRow>
       </SectionCard>
 
       <SectionCard title='Delete Output Interface'>
         <FormRow>
-          <Label htmlFor='del-outpart-id' className='w-32'>
-            Part ID
-          </Label>
-          <Input
-            id='del-outpart-id'
-            value={deleteOutputPartId}
-            onChange={(e) => setDeleteOutputPartId(e.target.value)}
-            placeholder='e.g. P1'
-            className='w-32'
-          />
-          <Label htmlFor='del-outparam-id' className='w-32'>
-            Interface ID
-          </Label>
-          <Input
-            id='del-outparam-id'
-            value={deleteOutputParamId}
-            onChange={(e) => setDeleteOutputParamId(e.target.value)}
-            placeholder='e.g. p2'
-            className='w-32'
-          />
+          <Pair>
+            <Label htmlFor='del-outpart-id' className='w-28'>
+              Part ID
+            </Label>
+            <Input
+              id='del-outpart-id'
+              value={deleteOutputPartId}
+              onChange={(e) => setDeleteOutputPartId(e.target.value)}
+              placeholder='e.g. P1'
+              className='w-32'
+            />
+          </Pair>
+          <Pair>
+            <Label htmlFor='del-outparam-id' className='w-28'>
+              Interface ID
+            </Label>
+            <Input
+              id='del-outparam-id'
+              value={deleteOutputParamId}
+              onChange={(e) => setDeleteOutputParamId(e.target.value)}
+              placeholder='e.g. p2'
+              className='w-32'
+            />
+          </Pair>
           <WideButton onClick={handleDeleteOutputParam} variant='destructive'>
             Delete
           </WideButton>

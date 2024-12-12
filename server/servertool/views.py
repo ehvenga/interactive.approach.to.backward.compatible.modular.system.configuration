@@ -286,6 +286,130 @@ class GetResultView(View):
 
         return lCourseObj
 
+@method_decorator(csrf_exempt, name='dispatch')
+class GetResultV2View(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            initials, goals = self.parse_request_data(data)
+            # Generate a transaction ID just like in the original approach
+            transactID = self.generate_transaction_id()
+
+            # Perform the forward chaining search
+            chain = self.find_chain(initials, goals)
+
+            if chain is None:
+                return JsonResponse({'transactionID': transactID, 'error': 'No solution found.'}, status=404)
+
+            # Format the results similar to get_result
+            results = self.format_results(chain)
+
+            return JsonResponse({'transactionID': transactID, 'results': results}, status=200)
+
+        except ValueError as ve:
+            return JsonResponse({'error': str(ve)}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def parse_request_data(self, data):
+        initials = data.get('initials', [])
+        goals = data.get('goals', [])
+
+        if not initials or not goals:
+            raise ValueError('Initials or goals are missing')
+
+        if has_common_member(initials, goals):
+            raise ValueError('Initials and goals should not overlap')
+
+        return initials, goals
+
+    def generate_transaction_id(self):
+        random.seed()
+        return random.randint(9000000, 10000000)
+
+    def find_chain(self, initials, goals):
+        """
+        Find a chain of webservices that produce the goal parameters from the initial parameters.
+        
+        Returns:
+            A list of tuples (webservice_obj, stage, input_params_used, output_params_produced)
+            or None if no solution is found.
+        """
+        known = set(initials)
+        goal_set = set(goals)
+
+        # If we already have all goals from the start
+        if goal_set.issubset(known):
+            return []  # no services needed
+
+        # Pre-load all webservices, input and output params
+        all_services = list(Webservicelist.objects.all())
+        service_inputs = {
+            svc.webserviceid: set(Inputparameter.objects.filter(webserviceid=svc.webserviceid).values_list('parameterid', flat=True))
+            for svc in all_services
+        }
+        service_outputs = {
+            svc.webserviceid: set(Outputparameter.objects.filter(webserviceid=svc.webserviceid).values_list('parameterid', flat=True))
+            for svc in all_services
+        }
+
+        used_services = set()
+        chain = []
+        stage = 1
+
+        # Forward-chaining loop
+        progress = True
+        while progress:
+            progress = False
+            for svc in all_services:
+                if svc.webserviceid in used_services:
+                    continue
+
+                inputs_needed = service_inputs[svc.webserviceid]
+                # Check if we can use this service now
+                if inputs_needed.issubset(known):
+                    # We can use this service
+                    outputs = service_outputs[svc.webserviceid]
+                    # Add to known parameters
+                    newly_added = outputs - known
+                    if newly_added:
+                        known.update(outputs)
+                        used_services.add(svc.webserviceid)
+                        # Record the chain step
+                        chain.append((svc, stage, list(inputs_needed), list(outputs)))
+                        stage += 1
+                        progress = True
+
+                        # Check if we've achieved all goals
+                        if goal_set.issubset(known):
+                            return chain
+            # If no service was found in this iteration, progress = False and loop ends
+
+        # If we reach here, no full solution was found
+        return None
+
+    def format_results(self, chain):
+        """
+        Format the chain results similar to get_result format:
+        [
+            {
+              ... all fields from Webservicelist model ...,
+              "stage": stage_number,
+              "input_parameters": [...],
+              "output_parameters": [...]
+            },
+            ...
+        ]
+        """
+        results = []
+        for (svc, stage, inputs, outputs) in chain:
+            svc_dict = model_to_dict(svc)
+            svc_dict['stage'] = stage
+            svc_dict['input_parameters'] = inputs
+            svc_dict['output_parameters'] = outputs
+            results.append(svc_dict)
+
+        return results
 
 #####################################
 # End of Views

@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     ParameterListView, InputParameterListView, OutputParameterListView, WebServiceListView,
     InitialGoalParameterListView, GetResultView, FilteredWebServiceView,
-    ParameterDetailView, WebServiceDetailView, InputParameterDetailView, OutputParameterDetailView
+    ParameterDetailView, WebServiceDetailView, InputParameterDetailView, OutputParameterDetailView, GetResultV2View
 )
 
 urlpatterns = [
@@ -27,5 +27,6 @@ urlpatterns = [
 
     # Result and Filtering
     path('get_result', GetResultView.as_view(), name='get_result'),
+    path('get_result_v2', GetResultV2View.as_view(), name='get_result_v2'),
     path('parameters/filter/', FilteredWebServiceView.as_view(), name='filtered-webservices'),
 ]
