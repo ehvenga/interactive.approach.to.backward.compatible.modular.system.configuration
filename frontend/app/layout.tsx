@@ -7,7 +7,7 @@ import Navbar from '@/components/navbar';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Autoblox: An Interactive Approach',
+  title: 'Auto-M-Design: An Interactive Approach',
   description: 'Solve your system configuration problems with Autoblox',
 };
 
@@ -18,9 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={inter.className}>
+      <body className={`${inter.className} flex flex-col h-screen`}>
         <Navbar />
-        <div className='bg-gray-100'>{children}</div>
+        <div className='bg-gray-100 flex-grow'>{children}</div>
       </body>
     </html>
   );
