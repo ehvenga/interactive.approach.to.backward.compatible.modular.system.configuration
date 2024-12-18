@@ -27,3 +27,4 @@ export const maxAllowedToBeSelectedPartsAtom = atom(50);
 export const initialIDAtom = atom([]);
 export const goalIDAtom = atom([]);
 export const isGoalAchievedAtom = atom<boolean>(false);
+export const backwardCompatibilityAtom = atom<boolean>(false);

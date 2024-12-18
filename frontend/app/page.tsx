@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useAtom } from 'jotai';
-import { stageAtom } from '@/utils/store';
+import { backwardCompatibilityAtom } from '@/utils/store';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-
 import ChooseParameters from '@/components/ChooseParameters';
 
 export default function Home() {
+  const [backwardCompatibility, setBackwardCompatibility] = useAtom(
+    backwardCompatibilityAtom
+  );
+
   return (
     <main className='px-24 py-10'>
       <div className='flex justify-between'>
@@ -16,8 +18,12 @@ export default function Home() {
           Interactive Design System
         </h1>
         <div className='flex items-center space-x-2'>
-          <Switch id='airplane-mode' />
-          <Label htmlFor='airplane-mode' className='text-lg'>
+          <Switch
+            id='backward-compatibility'
+            checked={backwardCompatibility}
+            onCheckedChange={(value) => setBackwardCompatibility(value)}
+          />
+          <Label htmlFor='backward-compatibility' className='text-lg'>
             Backward Compatibility
           </Label>
         </div>
