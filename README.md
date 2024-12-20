@@ -14,16 +14,80 @@ This Django-based tool provides an interactive platform to intelligently configu
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-### Prerequisites
+## Pre-requisites
 
-What things you need to install the software and how to install them:
+Before you start, ensure you have the following installed:
 
-```bash
-python -m pip install django
+1. **Node.js**
+2. **Python**
+3. **PIP**
+4. **Microsoft Visual Studio Code (VS Code)**
+5. **MySQL Workbench**
 
-git clone https://github.com/yourusername/yourprojectname.git
+## MySQL/Database Configuration
 
-pip install -r requirements.txt
+1. **Access Credentials**: Enter the username and password provided by Dr. Yoo.
+2. **Database**: We will use the `autowscs` database as it is linked to the `.jar` files.
 
-python manage.py runserver
-```
+## File Locations
+
+- **Project Directory**: `C:\AutoPlan\automsc`
+- **Git Directory**: `C:\AutoPlan\automsc\interactive.approach.to.backward.compatible.modular.system.configuration`
+
+## GitHub Setup
+
+1. **Account**: Create a GitHub account or use an existing one.
+2. **Install Git Tools**:
+   - Install GitBash and Git.
+3. **Repository**:
+   - Clone the repository from [v1.0 branch](https://github.com/ehvenga/interactive.approach.to.backward.compatible.modular.system.configuration).
+   - **Repository URL**: `https://github.com/ehvenga/interactive.approach.to.backward.compatible.modular.system.configuration`
+
+### Using Git
+
+1. Open the Git directory using Bash (or any terminal).
+2. Use the terminal in VS Code to navigate to the project files with `cd` commands.
+3. Login to your Git account.
+4. **Git Commands**:
+   - `git clone` - Clone the repository.
+   - `git pull` - Pull the latest changes.
+   - `git push` - Push your changes.
+   - Note: Do not push to the original repository; fork or clone it to maintain your own version.
+
+## Frontend Setup
+
+1. Navigate to the `/frontend` directory for React files.
+2. Install dependencies by running:
+   ```bash
+   npm i
+   ```
+3. Use the following commands:
+   - Start the development server (runs on port 3000):
+     ```bash
+     npm run dev
+     ```
+   - Build production files:
+     ```bash
+     npm run build
+     ```
+   - Run the production server (runs on port 3000):
+     ```bash
+     npm run start
+     ```
+
+## Backend Setup
+
+1. Navigate to the `/server` directory for Django files.
+2. Install dependencies by running:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. If any dependencies are missing, install them manually.
+4. Start the server (runs on port 8002):
+   ```bash
+   py manage.py runserver 8002
+   ```
+
+---
+
+Feel free to fork this repository and contribute! If you encounter any issues, please open an issue in the repository or contact the project maintainer
